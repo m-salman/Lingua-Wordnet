@@ -10,7 +10,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = ( );
 @EXPORT = qw( );
-$VERSION = '0.6';
+$VERSION = '0.65';
 $DICTDIR = '/usr/local/wordnet';
 $DELIM = '||';
 $SUBDELIM = '|';
@@ -336,7 +336,7 @@ See the Lingua::Wordnet::Analysis documentation for examples to retrieving and s
 
 =head1 BUGS/TODO
 
-Please send bugs and suggestions/requests to dbrian@brians.org. Development on this module is active as of Summer 2000.
+Please send bugs and suggestions/requests to dbrian@brians.org. Development on this module is active as of Spring 2001.
 
 Clean up code, put references where beneficial.
 
@@ -438,6 +438,14 @@ sub morph {
     return $self->{morphhash}->{"$word\%$pos"};
 }
 
+sub reverse_morph {
+    my $self = shift;
+    my $word = shift;
+    my $pos  = shift;
+    my %rev_hash = reverse %{$self->{morphhash}};
+    return $rev_hash{"$word"}; 
+}
+
 sub grep {
     my $self = shift;
     my $key = shift;
@@ -463,7 +471,7 @@ sub new_synset {
         my @offsets = (split(/\Q$SUBDELIM/,$offsets));
         $sense = scalar(@offsets);
     }
-    $word = $word . "\%$sense";
+    #$word = $word . "\%$sense";
     return Lingua::Wordnet::Synset->new(\$self,'',$pos,$word);
 }
 

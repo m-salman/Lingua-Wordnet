@@ -1,6 +1,6 @@
   ==================================================================
   Lingua::Wordnet
-  Copyright 1999,2000 by Dan Brian.
+  Copyright 1999,2000,2001 by Dan Brian.
 
   This program is free software; you can redistribute it and/or modify
   it under the same terms as Perl itself.
@@ -42,10 +42,9 @@ To configure and install, type:
  
   perl Makefile.PL
 
-This will locate the Wordnet data directory and run the program 
-'scripts/convertdb.pl' to rewrite the data in Berkeley DB 
-format. It will also ask where you want to new data files stored 
-(default is /usr/local/wordnet1.6/Lingua-Wordnet/). It will write
+Next, run the script 'scripts/convertdb.pl' to rewrite the data in Berkeley 
+DB format. It will also ask where you want to new data files stored 
+(default is /usr/local/wordnet1.6/lingua-wordnet/). It will write
 the following files, and will take quite a while:
 
     lingua_wordnet.index      - all indexes of all senses

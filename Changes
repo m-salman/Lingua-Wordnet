@@ -40,8 +40,19 @@ Revision history for Perl extension Lingua::Wordnet.
     - added test of overloaded behavior
 
 
-0.6
+0.6    Tue Oct 17 2000
     - Changed the overload syntax in Wordnet.pm (line 559) to work 
       for Perl < 5.6.
     - Fixed some typos in 'scripts/10questions.pl'
+
+0.65   Wed Feb 21 2001
+
+    - Fixed documentation errors
+    - Added reverse_morph() lookups (don't use them)
+    - Fixed errors in new_synset()
+
+Next (0.7):
+    - methods for XML delivery of data
+    - better reverse_morph() implementation
+    - enhanced creation of new fields
 
