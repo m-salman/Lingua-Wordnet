@@ -1,0 +1,8 @@
+Revision history for Perl extension Lingua::Wordnet.
+
+0.01  Mon May 17 10:58:40 1999
+	- original version; created by h2xs 1.19
+
+0.1   Mon Feb 2 1:28:30 2000
+    - rewrote whole module
+

@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+Wordnet.pm
+Analysis/Analysis.pm
+test.pl

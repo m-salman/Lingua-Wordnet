@@ -1,0 +1,124 @@
+    Perl Lingua::Wordnet
+    Copyright (c) 1999,2000 Daniel Brian. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+
+    a) the GNU General Public License as published by the Free
+    Software Foundation; either version 1, or (at your option) any
+    later version, or
+
+    b) the "Artistic License" which comes with this kit.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+    the GNU General Public License or the Artistic License for more details.
+
+    You should have received a copy of the Artistic License with this kit,
+    in the file named "Artistic".  If not, you can get one from the Perl
+    distribution. You should also have received a copy of the GNU General
+    Public License, in the file named "Copying". If not, you can get one
+    from the Perl distribution or else write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+    NOTE: Wordnet is not included in this package. It is copyrighted 
+    by Princeton University (see http://www.cogsci.princeton.edu/~wn/).
+
+
+
+WARNING: This is a beta version. I have not extensively tested all
+functionality, particularly those functions allowing writing to
+the database. I know there are bugs. Please help me by finding them!
+
+
+DESCRIPTION
+
+Wordnet is a lexical reference system inspired by current 
+psycholinguitics theories of human lexical memory. This module 
+allows access to the Wordnet lexicon from Perl applications, as 
+well as manipulation and extension of the lexicon. 
+Lingua::Wordnet::Analysis provides numerous high-level 
+extensions to the system.
+
+Version 0.1 is a complete rewrite of the module in pure Perl, 
+whereas the old module embedded the Wordnet C API functions. 
+In order to use the module, the database files must first be 
+converted to Berkeley DB files using the 'scripts/convertdb.pl' 
+script.
+
+
+REQUIREMENTS
+
+Perl 5.005, Berkeley DB 1.*, Wordnet 1.6 are required. The Wordnet 
+distribution does not need to be installed, but the data files 
+must be accessible for creation of the new data files. Wordnet 
+is available from http://www.cogsci.princeton.edu/~wn/.
+
+
+INSTALLATION
+
+To configure and install, type:
+ 
+  perl Makefile.PL
+
+This will locate the Wordnet data directory and run the program 
+'scripts/convertdb.pl' to rewrite the data in Berkeley DB 
+format. It will also ask where you want to new data files stored 
+(default is /usr/local/wordnet1.6/Lingua-Wordnet/). It will write
+the following files, and will take quite a while:
+
+    lingua_wordnet.index      - all indexes of all senses
+    lingua_wordnet.data       - all data files combined
+    lingua_wordnet.morph      - all exception data
+
+The files will be large (about 40MB total), but loading time is nominal, and
+searches are instant, since all data is mapped for lookup rather than scanned.
+The format of the new database is accessible with Berkeley DB, and consists of
+a hash mapping of each synset to a key, using the synset offset with the pos 
+character as the key for a synset. Added synsets increment the synset offsets 
+sequentially, but the original offsets are retained for legacy compatibility. 
+Lingua::Wordnet will look for these files in the directory indicated at the 
+start of the Wordnet.pm file. 
+
+Then:
+
+  make
+  make test
+
+The test will load the new Wordnet data files and run some tests
+on them. If any tests fail, stop and find out why. Then as root:
+
+  make install
+
+This will install the module among your Perl modules and install 
+the new data files. Since these are large, you should do a 
+'make clean' after the install to delete the local copies.
+
+
+DOCUMENTATION
+
+You can access the Lingua::Wordnet documentation with:
+
+  perldoc Lingua::Wordnet
+
+There is additional documentation in the 'docs/' directory, and 
+the scripts in 'scripts/' are fairly good references for 
+examples.
+
+
+WHAT THEN?
+
+If you are not familiar with Wordnet you should download and 
+read the "Five Papers" document at http://www.cogsci.princeton.edu/~wn/.
+
+
+EXTRA FILES
+
+docs/terms.txt            - a brief summary of Wordnet terms
+scripts/LWBrowser.pm      - an Apache/mod_perl module HTML font-end to 
+                            Lingua::Wordnet.
+scripts/report.pl         - generates statistics reports for databases
+
+
+
