@@ -1,7 +1,7 @@
 # This Makefile is for the Lingua::Wordnet::Analysis extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# 5.4302 (Revision: 1.222) from the contents of
+# 5.45 (Revision: 1.222) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #	ANY CHANGES MADE HERE WILL BE LOST!
@@ -18,26 +18,27 @@
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /usr/lib/perl5/5.00503/i386-linux/Config.pm)
+# These definitions are from config.sh (via /usr/local/lib/perl5/5.6.0/i686-linux/Config.pm)
 
 # They may have been overridden via Makefile.PL or on the command line
 AR = ar
 CC = cc
 CCCDLFLAGS = -fpic
-CCDLFLAGS = -rdynamic
+CCDLFLAGS = -rdynamic -Wl,-rpath,/usr/local/lib/perl5/5.6.0/i686-linux/CORE
 DLEXT = so
 DLSRC = dl_dlopen.xs
 LD = cc
 LDDLFLAGS = -shared -L/usr/local/lib
 LDFLAGS =  -L/usr/local/lib
-LIBC = 
+LIBC = /lib/libc-2.1.2.so
 LIB_EXT = .a
 OBJ_EXT = .o
 OSNAME = linux
-OSVERS = 2.2.9-chmou1
+OSVERS = 2.2.14
 RANLIB = :
 SO = so
 EXE_EXT = 
+FULL_AR = /usr/bin/ar
 
 
 # --- MakeMaker constants section:
@@ -53,33 +54,35 @@ INST_EXE = ../blib/script
 INST_LIB = ../blib/lib
 INST_ARCHLIB = ../blib/arch
 INST_SCRIPT = ../blib/script
-PREFIX = /usr
+PREFIX = /usr/local
 INSTALLDIRS = site
-INSTALLPRIVLIB = $(PREFIX)/lib/perl5/5.00503
-INSTALLARCHLIB = $(PREFIX)/lib/perl5/5.00503/i386-linux
-INSTALLSITELIB = $(PREFIX)/lib/perl5/site_perl/5.005
-INSTALLSITEARCH = $(PREFIX)/lib/perl5/site_perl/5.005/i386-linux
+INSTALLPRIVLIB = $(PREFIX)/lib/perl5/5.6.0
+INSTALLARCHLIB = $(PREFIX)/lib/perl5/5.6.0/i686-linux
+INSTALLSITELIB = $(PREFIX)/lib/perl5/site_perl/5.6.0
+INSTALLSITEARCH = $(PREFIX)/lib/perl5/site_perl/5.6.0/i686-linux
 INSTALLBIN = $(PREFIX)/bin
 INSTALLSCRIPT = $(PREFIX)/bin
-PERL_LIB = /usr/lib/perl5/5.00503
-PERL_ARCHLIB = /usr/lib/perl5/5.00503/i386-linux
-SITELIBEXP = /usr/lib/perl5/site_perl/5.005
-SITEARCHEXP = /usr/lib/perl5/site_perl/5.005/i386-linux
+PERL_LIB = /usr/local/lib/perl5/5.6.0
+PERL_ARCHLIB = /usr/local/lib/perl5/5.6.0/i686-linux
+SITELIBEXP = /usr/local/lib/perl5/site_perl/5.6.0
+SITEARCHEXP = /usr/local/lib/perl5/site_perl/5.6.0/i686-linux
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKE_APERL_FILE = Makefile.aperl
 PERLMAINCC = $(CC)
-PERL_INC = /usr/lib/perl5/5.00503/i386-linux/CORE
+PERL_INC = /usr/local/lib/perl5/5.6.0/i686-linux/CORE
 PERL = /usr/bin/perl
 FULLPERL = /usr/bin/perl
+FULL_AR = /usr/bin/ar
 
 VERSION_MACRO = VERSION
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
+PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc
 
-MAKEMAKER = /usr/lib/perl5/5.00503/ExtUtils/MakeMaker.pm
-MM_VERSION = 5.4302
+MAKEMAKER = /usr/local/lib/perl5/5.6.0/ExtUtils/MakeMaker.pm
+MM_VERSION = 5.45
 
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
@@ -100,13 +103,16 @@ XS_FILES=
 C_FILES = 
 O_FILES = 
 H_FILES = 
+HTMLLIBPODS    = 
+HTMLSCRIPTPODS = 
 MAN1PODS = 
 MAN3PODS = Analysis.pm
+HTMLEXT = html
 INST_MAN1DIR = ../blib/man1
 INSTALLMAN1DIR = $(PREFIX)/man/man1
 MAN1EXT = 1
 INST_MAN3DIR = ../blib/man3
-INSTALLMAN3DIR = $(PREFIX)/lib/perl5/man/man3
+INSTALLMAN3DIR = $(PREFIX)/man/man3
 MAN3EXT = 3
 PERM_RW = 644
 PERM_RWX = 755
@@ -225,7 +231,7 @@ PASTHRU = LIB="$(LIB)"\
 
 #all ::	config $(INST_PM) subdirs linkext manifypods
 
-all :: pure_all manifypods
+all :: pure_all htmlifypods manifypods
 	@$(NOOP)
 
 pure_all :: config pm_to_blib subdirs linkext
@@ -243,21 +249,21 @@ config :: $(INST_ARCHAUTODIR)/.exists
 config :: $(INST_AUTODIR)/.exists
 	@$(NOOP)
 
-$(INST_AUTODIR)/.exists :: /usr/lib/perl5/5.00503/i386-linux/CORE/perl.h
+$(INST_AUTODIR)/.exists :: /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h
 	@$(MKPATH) $(INST_AUTODIR)
-	@$(EQUALIZE_TIMESTAMP) /usr/lib/perl5/5.00503/i386-linux/CORE/perl.h $(INST_AUTODIR)/.exists
+	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h $(INST_AUTODIR)/.exists
 
 	-@$(CHMOD) $(PERM_RWX) $(INST_AUTODIR)
 
-$(INST_LIBDIR)/.exists :: /usr/lib/perl5/5.00503/i386-linux/CORE/perl.h
+$(INST_LIBDIR)/.exists :: /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h
 	@$(MKPATH) $(INST_LIBDIR)
-	@$(EQUALIZE_TIMESTAMP) /usr/lib/perl5/5.00503/i386-linux/CORE/perl.h $(INST_LIBDIR)/.exists
+	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h $(INST_LIBDIR)/.exists
 
 	-@$(CHMOD) $(PERM_RWX) $(INST_LIBDIR)
 
-$(INST_ARCHAUTODIR)/.exists :: /usr/lib/perl5/5.00503/i386-linux/CORE/perl.h
+$(INST_ARCHAUTODIR)/.exists :: /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h
 	@$(MKPATH) $(INST_ARCHAUTODIR)
-	@$(EQUALIZE_TIMESTAMP) /usr/lib/perl5/5.00503/i386-linux/CORE/perl.h $(INST_ARCHAUTODIR)/.exists
+	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h $(INST_ARCHAUTODIR)/.exists
 
 	-@$(CHMOD) $(PERM_RWX) $(INST_ARCHAUTODIR)
 
@@ -265,9 +271,9 @@ config :: $(INST_MAN3DIR)/.exists
 	@$(NOOP)
 
 
-$(INST_MAN3DIR)/.exists :: /usr/lib/perl5/5.00503/i386-linux/CORE/perl.h
+$(INST_MAN3DIR)/.exists :: /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h
 	@$(MKPATH) $(INST_MAN3DIR)
-	@$(EQUALIZE_TIMESTAMP) /usr/lib/perl5/5.00503/i386-linux/CORE/perl.h $(INST_MAN3DIR)/.exists
+	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h $(INST_MAN3DIR)/.exists
 
 	-@$(CHMOD) $(PERM_RWX) $(INST_MAN3DIR)
 
@@ -318,8 +324,14 @@ static :: Makefile $(INST_STATIC)
 # --- MakeMaker static_lib section:
 
 
+# --- MakeMaker htmlifypods section:
+
+htmlifypods : pure_all
+	@$(NOOP)
+
+
 # --- MakeMaker manifypods section:
-POD2MAN_EXE = /usr/bin/pod2man
+POD2MAN_EXE = /usr/local/bin/pod2man
 POD2MAN = $(PERL) -we '%m=@ARGV;for (keys %m){' \
 -e 'next if -e $$m{$$_} && -M $$m{$$_} < -M $$_ && -M $$m{$$_} < -M "Makefile";' \
 -e 'print "Manifying $$m{$$_}\n";' \
@@ -347,7 +359,7 @@ manifypods : pure_all Analysis.pm
 # the Makefile here so a later make realclean still has a makefile to use.
 
 clean ::
-	-rm -rf ./blib $(MAKE_APERL_FILE) $(INST_ARCHAUTODIR)/extralibs.all perlmain.c mon.out core so_locations pm_to_blib *~ */*~ */*/*~ *$(OBJ_EXT) *$(LIB_EXT) perl.exe $(BOOTSTRAP) $(BASEEXT).bso $(BASEEXT).def $(BASEEXT).exp
+	-rm -rf ./blib $(MAKE_APERL_FILE) $(INST_ARCHAUTODIR)/extralibs.all perlmain.c mon.out core core.*perl.*.? *perl.core so_locations pm_to_blib *~ */*~ */*/*~ *$(OBJ_EXT) *$(LIB_EXT) perl.exe $(BOOTSTRAP) $(BASEEXT).bso $(BASEEXT).def $(BASEEXT).exp
 	-mv Makefile Makefile.old $(DEV_NULL)
 
 
@@ -436,7 +448,7 @@ testdb_static :: testdb_dynamic
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd:
-	@$(PERL) -e "print qq{<SOFTPKG NAME=\"Lingua-Wordnet-Analysis\" VERSION=\"0,3,0,0\">\n}. qq{\t<TITLE>Lingua-Wordnet-Analysis</TITLE>\n}. qq{\t<ABSTRACT></ABSTRACT>\n}. qq{\t<AUTHOR></AUTHOR>\n}. qq{\t<IMPLEMENTATION>\n}. qq{\t\t<OS NAME=\"$(OSNAME)\" />\n}. qq{\t\t<ARCHITECTURE NAME=\"i386-linux\" />\n}. qq{\t\t<CODEBASE HREF=\"\" />\n}. qq{\t</IMPLEMENTATION>\n}. qq{</SOFTPKG>\n}" > Lingua-Wordnet-Analysis.ppd
+	@$(PERL) -e "print qq{<SOFTPKG NAME=\"Lingua-Wordnet-Analysis\" VERSION=\"0,3,0,0\">\n}. qq{\t<TITLE>Lingua-Wordnet-Analysis</TITLE>\n}. qq{\t<ABSTRACT></ABSTRACT>\n}. qq{\t<AUTHOR></AUTHOR>\n}. qq{\t<IMPLEMENTATION>\n}. qq{\t\t<OS NAME=\"$(OSNAME)\" />\n}. qq{\t\t<ARCHITECTURE NAME=\"i686-linux\" />\n}. qq{\t\t<CODEBASE HREF=\"\" />\n}. qq{\t</IMPLEMENTATION>\n}. qq{</SOFTPKG>\n}" > Lingua-Wordnet-Analysis.ppd
 
 # --- MakeMaker pm_to_blib section:
 

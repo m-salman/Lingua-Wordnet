@@ -1,10 +1,11 @@
 Revision history for Perl extension Lingua::Wordnet.
 
 0.01  Mon May 17 10:58:40 1999
-	- original version; created by h2xs 1.19
+    - original version; created by h2xs 1.19
 
 0.1   Mon Feb 2 1:28:30 2000
-    - rewrote whole module
+    - rewrote whole module to convert dbs to Berkeley DB files
+    - took out all Wordnet C API code
 
 0.2   Fri Apr 14 11:24:30 2000
     - added pointer counting to 'scripts/report.pl'
@@ -22,4 +23,12 @@ Revision history for Perl extension Lingua::Wordnet.
     - lots of POD edits
     - improved (fixed) lots of add/delete pointer functions
     - fixed Lingua::Wordnet::Analysis::match()
+
+0.4   Thu Aug 24 11:36:14 2000
+    - fixed installation to recommend a 'cd' to convert the dbs
+    - removed plan to automate the synchronization of corrsponding 
+      pointer types
+    - more POD updates and typos
+    - added a small 'wn.pl' script to 'scripts/' to illustrate the most 
+      basic usage
 

@@ -27,14 +27,10 @@
 
 
 
-NOTE: If you are upgrading from a previous version, you will need to 
-rebuild your Wordnet database files to accomodate the new morph() 
-function and delimiter format. See Changes for details. Also note that you 
-can now specify the characters used as delimiters in Wordnet.pm and 
-convertdb.pl.
+NOTE: If you are upgrading from a previous version, you may need to 
+rebuild your Wordnet database files to accomodate new or changed 
+functions. See Changes for details.
 
-This is beta software. Specifically, the add/modify synset functions are 
-not complete and require further testing.
 
 
 DESCRIPTION
@@ -115,8 +111,10 @@ examples.
 
 WHAT THEN?
 
-If you are not familiar with Wordnet you should download and 
-read the "Five Papers" document at http://www.cogsci.princeton.edu/~wn/.
+If you are not familiar with Wordnet you should download and read the l
+"Five Papers" document at http://www.cogsci.princeton.edu/~wn/.  An 
+article on this module appeared in the summer 2000 Perl Journal (#18), 
+for the curious.
 
 
 EXTRA FILES
@@ -128,8 +126,4 @@ scripts/report.pl         - generates statistics reports for databases
 scripts/10questions.pl    - demonstrates Analysis.pm with a game of 
                             "10 Questions"
 
-TODOS
-
-- fully test and fix add_synset functions
-- add more tests
 

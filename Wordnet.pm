@@ -10,8 +10,8 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = ( );
 @EXPORT = qw( );
-$VERSION = '0.3';
-$DICTDIR = '/usr/local/wordnet1.6/lingua-wordnet/';
+$VERSION = '0.4';
+$DICTDIR = '/usr/local/wordnet';
 $DELIM = '||';
 $SUBDELIM = '|';
 
@@ -22,9 +22,7 @@ Lingua::Wordnet - Perl extension for accessing and manipulating Wordnet database
 =head1 SYNOPSIS
 
   use Lingua::Wordnet;
-  use Lingua::Analysis;
-
-  print $wn->overview("canary");
+  use Lingua::Wordnet::Analysis;
 
   $wn->unlock();
   $synset = $wn->lookup_synset("canary","n",4);
@@ -37,7 +35,7 @@ Lingua::Wordnet - Perl extension for accessing and manipulating Wordnet database
 
 Wordnet is a lexical reference system inspired by current psycholinguitics theories of human lexical memory. This module allows access to the Wordnet lexicon from Perl applications, as well as manipulation and extension of the lexicon. Lingua::Wordnet::Analysis provides numerous high-level extensions to the system.
 
-Version 1.0 is a complete rewrite of the module in pure Perl, whereas the old module embedded the Wordnet C API functions. In order to use the module, the database files must first be converted to Berkeley DB files using the 'scripts/convertdb.pl' file. Why did I do that?
+Version 0.1 was a complete rewrite of the module in pure Perl, whereas the old module embedded the Wordnet C API functions. In order to use the module, the database files must first be converted to Berkeley DB files using the 'scripts/convertdb.pl' file. Why did I do that?
 
 - The Wordnet API consists mostly of searching and text manipulation functions, something Perl is, um .. well suited for.
 
@@ -127,12 +125,12 @@ function name. These functions accept a synset object or objects as input. Unles
  $synset->add_antonyms($synset2[, ...])
  $synset->delete_antonyms($synset2[, ...])
 
-Returns, adds, or deletes antonyms for $synset. If a value is added or deleted, antonyms() will also add entries to the added synsets to maintain consistency when $synset->write() is called. WARNING: Throughout this doc the claim is made that this consistency is automated. It isn't. It will be soon.
+Returns, adds, or deletes antonyms for $synset. WARNING: When adding/deleting synset pointers to Wordnet, it is important to add pointer entries to the corresponding synset in order to maintain database accuracy. Earlier versions of this module planned to automate this function, however, they have been abandoned in favor of having control over database writes with the 'write()' function, and are now considered functionality which belongs outside of the module. Thus, your program must implement the functionality to, in the above examples, add an antonym entry to '$synset' for '$synset2', in addition to adding an antonym entry to '$synset2' for '$synset'.
 
 
 =item $synset->hypernyms()
 
-Returns hypernyms for $synset. If a value modified using add_hypernyms() or delete(hypernyms), the function will also add $synset to the hyponyms for any added synsets to maintian consistency (when write() is called). A subsequent call to hyponyms() is not necessary.
+Returns hypernyms for $synset.
 
 =item $synset->hyponyms()
 
@@ -145,9 +143,6 @@ Returns verb entailment pointers.
 =item $synset->synonyms()
 
 Returns synonyms for $synset. Note that all words within $synset are synonyms.
-
-
-All of the meronym and holonym functions update complimentary synsets when write() is called. For example, if a synset for "concrete" is added to the stuff meronyms for "sidewalk", "sidewalk" will be added to the stuff holonyms for "concrete". A subsequent call to add_stuff_holonyms() is not necessary if write() is called.
 
 
 =item $synset->comp_meronyms()
@@ -240,7 +235,7 @@ Returns the 'pertains to' pointers for adj and adv.
 
 =item $synset->frames()
 
-Returns a text array of verb frames for $synset. The add_frames() and delete_frames() functions accept only integers corresponding to the frames. The list of frames can be edited in Wordnet.pm directly.
+Returns a text array of verb frames for $synset. The add_frames() and delete_frames() functions accept only integers corresponding to the frames. The list of frames can be edited in Wordnet.pm directly, but probably shouldn't be.
 
 
 =item $synset->lex_info([INT])
@@ -328,11 +323,6 @@ And an assignment example. This will create a new synset and add it to the kinds
 
 Remember, proceeded most synset functions with "add" will append the supplied data to the corresponding field, rather than replacing its value.
 
-Rather than add the new synset to the hyponyms of "baseball", we could have added "baseball" to the hypernyms of the new synset "fooball", since links are always kept synchronized:
-
-
- $newsynset->add_hypernyms($synset);
-
 
 We could add an attribute 'fun' to "fooball" thus (not necessarily recommended pointer, but it will suffice for an example):
 
@@ -345,7 +335,7 @@ See the Lingua::Wordnet::Analysis documentation for examples to retrieving and s
 
 =head1 BUGS/TODO
 
-Please send bugs and suggestions/requests to dbrian@brians.org. Development on this module is active as of Spring 2000.
+Please send bugs and suggestions/requests to dbrian@brians.org. Development on this module is active as of Summer 2000.
 
 Clean up code, put references where beneficial.
 
@@ -405,6 +395,7 @@ sub close {
     $self->DESTROY();
 }
 
+# Anybody want to write an overview()? Please send it to me.
 sub overview {
 
 }

@@ -11,7 +11,7 @@ $SUBDELIM = '|';
 print "This program will convert your Wordnet databases into files usable by\nLingua::Wordnet. This will not affect your existing Wordnet files, but\nwill require up to 40MB disk space. Continue? [y]";
 if (<STDIN> =~ /^n/i) { return; }
 
-if (shift(@ARGV) =~ /DATA_DIR=(.*)\s*$/) {
+if (shift(@ARGV) =~ /DICTDIR=(.*)\s*$/) {
     $datadir = $1;
 }
 if (!$datadir) {
@@ -206,7 +206,7 @@ if ($newdir ne "/usr/local/wordnet1.6/lingua-wordnet/"){
     open NEWFILE, ">Wordnet.pm";
     while (<FILE>) {
         if (/^\$DICTDIR/) {
-            print NEWFILE "\$DICTDIR = '$newdir'\n";
+            print NEWFILE "\$DICTDIR = '$newdir';\n";
         } else {
             print NEWFILE;
         }
