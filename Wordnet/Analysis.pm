@@ -4,7 +4,7 @@ use strict;
 use Lingua::Wordnet;
 use vars qw($VERSION);
 
-$VERSION = '0.73';
+$VERSION = '0.74';
 
 =head1 NAME
 
@@ -165,7 +165,171 @@ sub distance {
     my ($found,$count) = &{$findit}($synset1,$matching,$ptrtype,0);
     if ($found) { return $count; }
     else { return 0; }
+}
 
+
+sub global_distance {
+	my $self = shift;
+
+	my $syns1 = shift;
+	my $syns2 = shift;
+
+	my $maxdist = shift; 
+	my $dist = shift;
+	my $checked = shift || {};
+
+	my $parentpathes = shift;
+
+	unless (defined $dist) {
+		if ($#{$syns1} < $#{$syns2}) {
+#			print "Swapping syns1 and syns2\n";
+	    	my $tmp = $syns1;
+    		$syns1 = $syns2;
+    		$syns2 = $tmp;
+		}
+	}
+
+	unless ($parentpathes) {
+ 		$parentpathes = [ (map { $_->offset } @{$syns2}) ];
+	}
+#	print "Checked " . scalar keys( %{$checked} ) . " so far.\n";
+#	print "Now checking: " . scalar @{$syns2} . " syns agains " . scalar @{$syns1} . "\n";
+	if ($maxdist && $dist && $dist > $maxdist) { return (undef, "Max. distance ($maxdist) reached\n");  }
+	my @around;
+	my @pathes;
+	my $i = 0;
+	foreach my $syn2 (@{$syns2}) {
+
+		$checked->{$syn2->offset} = 1;
+		foreach my $syn1(@{$syns1}) {
+			# compare syn1 and syn2
+			if ($self->equals($syn1, $syn2)) {
+				return ( ( $dist || 0 ), ($parentpathes->[$i] || ""));
+			}
+# =comment (this was slower)
+# 			if (my $hyper = is_hypernym($syn1, $syn2)) {
+# 				return ($dist) ? ($dist+1, $parentpathes->[$i] . " : " . $hyper->offset . "|hyper") : (1, $parentpathes->[$i] . " : " . $hyper->offset . "|hyper");
+# 			}
+# 			if (my $hypo = is_hyponym($syn1, $syn2)) {
+# 				return ($dist) ? ($dist+1, $parentpathes->[$i] . " : " . $hypo->offset . "|hypo") : (1, $parentpathes->[$i] . " : " . $hypo->offset . "|hypo");
+# 			}
+# 			if (my $mero = is_meronym($syn1, $syn2)) {
+# 				return ($dist) ? ($dist+1, $parentpathes->[$i] . " : " . $mero->offset . "|mero") : (1, $parentpathes->[$i] . " : " . $mero->offset . "|mero");
+# 			}
+# 			if (my $holo = is_holonym($syn1, $syn2)) {
+# 				return ($dist) ? ($dist+1, $parentpathes->[$i] . " : " . $holo->offset . "|holo") : (1, $parentpathes->[$i] . " : " . $holo->offset . "|holo");
+# 			}
+# =cut
+		}
+		# get surrounding synsets of $syn2
+		my ($ar, $pa) = $self->get_surroundings($syn2, $checked, $parentpathes->[$i]);
+		push @pathes, @{$pa};
+		push @around, @{$ar};
+		$i++;
+	}
+
+	return $self->global_distance($syns1, \@around, $maxdist, (($dist) ? $dist+1 : 1), $checked, \@pathes);
+}
+
+
+sub equals {
+	my $self = shift;
+	my $syn1 = shift;
+	my $syn2 = shift;
+
+	return 1 if ($syn1->offset eq $syn2->offset);
+	return 0;
+}
+
+sub is_hypernym {
+	my $self = shift;
+	my $syn1 = shift;
+	my $syn2 = shift;
+
+	foreach ($syn2->hypernyms) {
+		if ($self->equals($syn1, $_)) {
+			# print "MATCH: $syn2 is a HYPERNYM of $syn1\n";
+			return $_;
+		}
+	}
+	return 0;
+}
+
+sub is_hyponym {
+	my $self = shift;
+	my $syn1 = shift;
+	my $syn2 = shift;
+
+	foreach ($syn2->hyponyms) {
+		if ($self->equals($syn1, $_)) {
+			# print "MATCH: $syn2 is a HYPONYM of $syn1\n";
+			return $_;
+		}
+	}
+	return 0;
+}
+
+sub is_meronym {
+	my $self = shift;
+	my $syn1 = shift;
+	my $syn2 = shift;
+
+	foreach ($syn2->all_meronyms) {
+		if ($self->equals($syn1, $_)) {
+			# print "MATCH: $syn2 is a MERONYM of $syn1\n";
+			return $_;
+		}
+	}
+	return 0;
+}
+
+
+sub is_holonym {
+	my $self = shift;
+	my $syn1 = shift;
+	my $syn2 = shift;
+	foreach ($syn2->all_holonyms) {
+		if ($self->equals($syn1, $_)) {
+			# print "MATCH: $syn2 is a HOLONYM of $syn1\n";
+			return $_;
+		}
+	}
+	return 0;
+}
+
+
+sub get_surroundings { 
+	my $self = shift;
+	my $syn = shift;
+	my $checked = shift;
+	my $parentpath = shift || "";
+	my @around;
+	my @pathes; 
+	foreach ($syn->hypernyms) {
+		unless ($checked->{$_->offset}) {
+			push @pathes, join (" : ", $parentpath,  $_->offset . "|hyper");
+			push @around,$_;
+		}
+	}
+	foreach ($syn->hyponyms) {
+		unless ($checked->{$_->offset}) {
+			push @pathes, join (" : ", $parentpath,  $_->offset . "|hypo");
+			push @around,$_;
+		}
+	}
+	foreach ($syn->all_meronyms) {
+		unless ($checked->{$_->offset}) {
+			push @pathes, join (" : ", $parentpath, $_->offset . "|mero");
+			push @around,$_;
+		}
+	}
+	foreach ($syn->all_holonyms) {
+		unless ($checked->{$_->offset}) {
+			push @pathes, join (" : ", $parentpath, $_->offset . "|holo");
+			push @around,$_;
+		}
+	}
+	return (\@around, \@pathes);	
 }
 
 sub search {
@@ -254,7 +418,6 @@ sub intersection {
     my %valuehash;
     foreach (@$array) { push @intersection, 
         $_->{offset}; $valuehash{$_->{offset}} = $_; }
-    my $set;
     while ($set = shift) {
         my $newlist;
         foreach (@$set) {

@@ -1,6 +1,6 @@
   ==================================================================
   Lingua::Wordnet
-  Copyright 1999,2000,2001 by Dan Brian.
+  Copyright 1999,2000,2001,2004 by Dan Brian.
 
   This program is free software; you can redistribute it and/or modify
   it under the same terms as Perl itself.
@@ -10,13 +10,6 @@
 NOTE: If you are upgrading from a previous version, you may need to 
 rebuild your Wordnet database files to accomodate new or changed 
 functions. See Changes for details.
-
-HELP!: This module is going through a significant redesign in preparation 
-for involvement in several large projects. I am seeking involvement in this 
-design; specifically, I need some good RDBM designers, and a few people 
-who are very familiar with Wordnet usage in applications. This is intended 
-to be a definitive Open Source lexicon, and I want it done right. Come 
-to http://linguana.net for more information.
 
 
 DESCRIPTION

@@ -7,10 +7,9 @@ use Lingua::Wordnet;
 $loaded = 1;
 print "ok 1\n";
 
-
 $wn = new Lingua::Wordnet;
 
-my $synset = $wn->lookup_synset_offset("00333350%n");
+my $synset = $wn->lookup_synset_offset("00447188%n");  # baseball
 
 if ($synset) { print "ok 2\n"; }
 else         { print "not ok 2\n"; }
@@ -45,7 +44,6 @@ else                                { print "not ok 6\n"; }
 
 if ($synset =~ /baseball/) { print "ok 7\n"; }
 else                        { print "not ok 7\n"; }                                 
-
 $wn->close();
 
 

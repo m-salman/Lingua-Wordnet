@@ -2,6 +2,8 @@ package Lingua::Wordnet;
 
 require 5.005;
 use strict;
+use warnings;
+
 use vars qw($VERSION @ISA @EXPORT_OK @EXPORT $DICTDIR $DELIM $SUBDELIM);
 use DB_File;
 
@@ -10,8 +12,8 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = ( );
 @EXPORT = qw( );
-$VERSION = '0.73';
-$DICTDIR = '/usr/local/lingua-wordnet/';
+$VERSION = '0.74';
+$DICTDIR = '/usr/local/WordNet-2.0/lingua-wordnet/';
 $DELIM = '||';
 $SUBDELIM = '|';
 
@@ -54,6 +56,8 @@ With that said, there are actually two modules. Lingua::Wordnet impersonates the
 
 =head1 Lingua::Wordnet functions
 
+=over 4
+
 =item $wn = new Lingua::Wordnet( [DATA_DIR] );
 
 Creates and assigns a new object of class Lingua::Wordnet. DATA_DIR is optional, and indicates the location of the index and data files. 
@@ -88,8 +92,11 @@ Assigns a synset object SYNSET_OFFSET.
 
 Creates a new (empty) synset entry in the database. Both WORD and POS are required. An offset will be assigned when write() is called.
 
+=back
 
 =head1 Lingua::Wordnet::Synset functions
+
+=over 4
 
 =item @words = $synset->words([TEXT ..)]
 
@@ -105,7 +112,7 @@ Returns an integer of the familiarity/polysemy count for WORD in POS. Given a th
 
 =item $wn->morph(WORD, POS)
 
-Returns a form of WORD in POS as found in the Wordnet morph files. The synset_lookup() functions performs morphological conversion automatically, so a call to morph() is not required.
+Returns an array containing the base form(s) of WORD in POS as found in the Wordnet morph files. The synset_lookup() functions performs morphological conversion automatically, so a call to morph() is not required. Changes: This fuynction now returns an array, because on WORD may have more than one base form.
 
 
 =item $synset->overview()
@@ -143,7 +150,7 @@ Returns verb entailment pointers.
 
 =item $synset->synonyms()
 
-Returns synonyms for $synset. Note that all words within $synset are synonyms.
+Returns a list of words within $synset. 
 
 
 =item $synset->comp_meronyms()
@@ -247,6 +254,7 @@ Returns a string containing lexicographer file information. The optional INT ass
 
 Returns the synset offset of $synset.
 
+=back 
 
 =head1 EXAMPLES
 
@@ -397,24 +405,37 @@ sub close {
 sub familiarity {
     my $self = shift;
     my ($word,$pos) = @_;
-    return (split(/\Q$DELIM/,$self->{indexhash}->{"$word\%$pos"}))[0];
+	if ($self->{indexhash}->{"$word\%$pos"}) {
+	    return (split(/\Q$DELIM/,$self->{indexhash}->{"$word\%$pos"}))[0];
+	} else {
+		return undef;
+	}
 }
 
 sub lookup_synset {
     my $self = shift;
-    my ($word,$pos,$num) = @_;
+	my ($word,$pos,$num) = @_;	
     if (!exists($self->{indexhash}->{"$word\%$pos"})) {
-        $word = $self->morph($word,$pos);
-        if (!$word) { return; }
-        if (!exists($self->{indexhash}->{"$word\%$pos"})) {
-            return;
-        }
+		#print "Morphing $word\n";
+        my @morphed = $self->morph($word,$pos);
+		my @synsets;
+		foreach (@morphed) {
+			next if ($_ eq $word);
+			#print "M: $_\n";
+			push @synsets, $self->lookup_synset($_, $pos); 
+		}
+		if ($num) {
+			return $synsets[$num-1];
+		} else {
+			return @synsets;
+		}
     }
     if ($pos && $num) {
         my ($poly,$offsets) = split(/\Q$DELIM/,$self->{indexhash}->{"$word\%$pos"});
         my $offset = (split(/\Q$SUBDELIM/,$offsets))[$num-1] . "\%$pos";
         return Lingua::Wordnet::Synset->new(\$self,$offset,$pos);
     } else {
+#		print qq|$word is in index: $self->{indexhash}->{"$word\%$pos"}\n|;
         my ($poly,$offsets) = split(/\Q$DELIM/,$self->{indexhash}->{"$word\%$pos"});
         my @offsets = (split(/\Q$SUBDELIM/,$offsets));
         my @synsets;
@@ -435,7 +456,15 @@ sub morph {
     my $self = shift;
     my $word = shift;
     my $pos = shift;
-    return $self->{morphhash}->{"$word\%$pos"};
+    my $morphed = $self->{morphhash}->{"$word\%$pos"};
+	return unless $morphed;
+	my @morphed;
+	if ($morphed =~ /\Q$DELIM/) {
+		@morphed = split(/\Q$DELIM/, $morphed);
+	} else {
+		@morphed = ($morphed);
+	}
+	return wantarray ? @morphed : $morphed[0] || undef;
 }
 
 sub reverse_morph {
@@ -443,7 +472,20 @@ sub reverse_morph {
     my $word = shift;
     my $pos  = shift;
     my %rev_hash = reverse %{$self->{morphhash}};
-    return $rev_hash{"$word"}; 
+	if ($rev_hash{"$word"}) {
+    	return $rev_hash{"$word"}; 
+	} else {
+		# this takes care of multiple baseforms of a word
+		my @words = map { $rev_hash{$_} } grep {	/^$word\Q$DELIM/ || 
+							/\Q$DELIM\E$word\Q$DELIM\E/ ||
+							/\Q$DELIM\E$word$/ } keys %rev_hash;
+
+		if ($#words > 0) {
+			print STDERR "Warning Something is wrong: $word has more the one reverse morphed meanings\n";
+			print STDERR "\t" . join(",", @words);
+		}
+		return $words[0];
+	}
 }
 
 sub grep {
@@ -691,6 +733,14 @@ sub delete_words {
     $self->{words} = join("$Lingua::Wordnet::SUBDELIM",@retwords);
 }
 
+sub synonyms {
+	my $self = shift;
+
+	my @syns;
+	my @words = $self->words;
+	return wantarray ? @words : \@words;
+}
+
 # standard synset functions
 
 sub synset_pointers {
@@ -714,12 +764,13 @@ sub add_synset_pointers {
         }
     }
 }
+
 sub delete_synset_pointers {
     my ($self,$ptr,@synsets) = @_;
     my $synset;
     my $delim = "$Lingua::Wordnet::SUBDELIM";
     foreach $synset (@synsets) {
-        $self->{ptrs} =~ s/(?:$delim)*$ptr\s$synset->{offset}\s\d{4}//g;
+        $self->{ptrs} =~ s/(?:\Q$delim\E)*$ptr\s$synset->{offset}\s\d{4}//g;
     }
     $self->{ptrs} =~ s/^\Q$Lingua::Wordnet::SUBDELIM//;
 }
@@ -1170,19 +1221,166 @@ sub delete_see_also {
 # pointers to noun objects of the verb function, a frame number, and a 
 # word number of the word in that frame which corresponds to the noun.
 # But not now. :)
-sub functions {
+
+#sub functions {
+#    my $self = shift;
+#    return synset_pointers($self,'\+');
+#}
+#sub add_functions {
+#    my $self = shift;
+#    my @add_synsets = @_;
+#    add_synset_pointers($self,"\+",@add_synsets);
+#}
+#sub delete_functions {
+#    my $self = shift;
+#    my @delete_synsets = @_;
+#    delete_synset_pointers($self,'\+',@delete_synsets);
+#}
+
+
+# in WordNet 2.0 the '+' - pointer is used for lexical links for 
+# derivational morphology (new)
+#
+# From CHANGES:
+# Lexical links for derivational morphology are represented as 
+# "+".  Note that in verson 1.7.1, some links between nouns and
+# verbs were present in the lexicographer files, but not in the
+# database files.  In the 1.7.1 lexicographer files, these
+# links were represented by the "+" character, followed by a
+# letter from "a" to "x".  The letter is no longer present, and
+# all derivational links are indicated simply by the "+"
+# pointer type.   Also note that the "+" character also
+# precedes the list of verb frames in the verb data file.  The
+# verb frame list always follows the pointer list, therefore
+# the "+" character used for the different purposes are
+# distinguishable.
+
+sub derivedforms {
     my $self = shift;
     return synset_pointers($self,'\+');
 }
-sub add_functions {
+sub add_derivedforms {
     my $self = shift;
     my @add_synsets = @_;
     add_synset_pointers($self,"\+",@add_synsets);
 }
-sub delete_functions {
+sub delete_derivedforms {
     my $self = shift;
     my @delete_synsets = @_;
     delete_synset_pointers($self,'\+',@delete_synsets);
+}
+
+# Domains and Domain Terms (new in WN 2.0)
+#
+# From the CHANGES:
+# Some synsets have been organized into topical domains.
+# Domains are always noun synset, however synsets from every
+# syntacic category may be classified.  Each domain is further
+# classified as a CATEGORY, REGION, or USAGE.  A pointer from a
+# domain term synset to its topic is represented by the ";"
+# pointer character, followed by "c", "r", or "u", indicating
+# the type of domain.  The converse relation, from a domain to
+# the synsets in that domain, is represented by the "-" pointer
+# character, also followed by "c", "r", or "u".
+
+sub all_domains {
+    my $self = shift;
+    return synset_pointers($self,";");
+}
+
+sub category_domains {
+    my $self = shift;
+    return synset_pointers($self,";c");
+}
+sub add_category_domains {
+    my $self = shift;
+    my @add_synsets = @_;
+    add_synset_pointers($self,";c",@add_synsets);
+}
+sub delete_category_domains {
+    my $self = shift;
+    my @delete_synsets = @_;
+    delete_synset_pointers($self,';c',@delete_synsets);
+}
+
+sub region_domains {
+    my $self = shift;
+    return synset_pointers($self,";r");
+}
+sub add_region_domains {
+    my $self = shift;
+    my @add_synsets = @_;
+    add_synset_pointers($self,";r",@add_synsets);
+}
+sub delete_region_domains {
+    my $self = shift;
+    my @delete_synsets = @_;
+    delete_synset_pointers($self,';r',@delete_synsets);
+}
+
+sub usage_domains {
+    my $self = shift;
+    return synset_pointers($self,";u");
+}
+sub add_usage_domains {
+    my $self = shift;
+    my @add_synsets = @_;
+    add_synset_pointers($self,";u",@add_synsets);
+}
+sub delete_usage_domains {
+    my $self = shift;
+    my @delete_synsets = @_;
+    delete_synset_pointers($self,';u',@delete_synsets);
+}
+
+# domain terms
+sub all_domainterms {
+	my $self = shift;
+	return synset_pointers($self,"-");
+}
+sub category_domainterms {
+	my $self = shift;
+	return synset_pointers($self,"-c");
+}
+sub add_category_domainterms {
+    my $self = shift;
+    my @add_synsets = @_;
+    add_synset_pointers($self,"-c",@add_synsets);
+}
+sub delete_category_domainterms {
+    my $self = shift;
+    my @delete_synsets = @_;
+    delete_synset_pointers($self,'-c',@delete_synsets);
+}
+
+sub region_domainterms {
+	my $self = shift;
+	return synset_pointers($self,"-r");
+}
+sub add_region_domainterms {
+    my $self = shift;
+    my @add_synsets = @_;
+    add_synset_pointers($self,"-r",@add_synsets);
+}
+sub delete_region_domainterms {
+    my $self = shift;
+    my @delete_synsets = @_;
+    delete_synset_pointers($self,'-r',@delete_synsets);
+}
+
+sub usage_domainterms {
+	my $self = shift;
+	return synset_pointers($self,"-u");
+}
+sub add_usage_domainterms {
+    my $self = shift;
+    my @add_synsets = @_;
+    add_synset_pointers($self,"-u",@add_synsets);
+}
+sub delete_usage_domainterms {
+    my $self = shift;
+    my @delete_synsets = @_;
+    delete_synset_pointers($self,'-u',@delete_synsets);
 }
 
 sub lex_info {

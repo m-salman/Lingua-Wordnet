@@ -94,10 +94,41 @@ Revision history for Perl extension Lingua::Wordnet.
     - Changes synset write() behaviour to store offsets correctly, and 
       changed Lingua::Wordnet typos. Thanks Marco Nova.
 
+0.74    Wed Aug 11 2004
+
+    - Fixed tests for Wordnet 2.0
+    - Significant updates thanks to Markus Koppenberger and his group at 
+      Universidad Pompeu Fabra:
+
+      * Wordnet.pm
+        - morph() now returns an array (it's possible that a word has more than 
+          one baseform
+        - reverse_morph() does the same ...
+        - lookup_synset returns the synsets for all forms of morph
+        - the 'functions' are commented now, because WN 2.0 uses the '+' pointer
+          for derivational morphology
+        - added functions for domains and domainterms (all_domains, 
+          category_domains, region_domains, usage_domains and all_domainterms, 
+          category_domainterms, region_domainterms,  usage_domainterms). there
+          are also example 2 scripts for that functions
+      
+      * convertdb.pl
+        - some code-cleanup: added -w and 'use strict', Removed some global 
+          variables and corrected some typos. Added some comments.
+        - loops over all pos-types (index.<pos>, <pos>.exc and data.<pos>
+        - changed structure of lingua_wordnet.morph: if there are more than one 
+          baseform, the value of the morph-hash will contain both seperated by 
+          $DELIM
+
+      * Analysis.pm
+        - added a function 'global_distance', which tries to find the steps 
+          needed from one to another synset. (highly experimental, very slow)
+
+      * scripts/
+        - added scripts to show the new functionalities
+
 TODO:
+    - find someone to maintain the module
     - methods for XML delivery of data
-    - better reverse_morph() implementation
-    - enhanced creation of new fields
-    (these changes are part of the Linguana project - http://linguana.net)
 
 
