@@ -11,9 +11,10 @@ print "ok 1\n";
 $wn = new Lingua::Wordnet;
 $analysis = new Lingua::Wordnet::Analysis;
 
-$synset = $wn->lookup_synset_offset("00300911%n");
+$synset = $wn->lookup_synset_offset("00333210%n");
 $synset2 = $wn->lookup_synset("field_game","n",1);
-if ($analysis->match($synset->hypernyms,$synset2) == 1)
+
+if ($analysis->match($synset2,$synset->hypernyms) > 0)
      { print "ok 2\n"; }
 else { print "not ok 2\n"; }
 

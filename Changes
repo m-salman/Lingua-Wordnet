@@ -85,6 +85,11 @@ Revision history for Perl extension Lingua::Wordnet.
       to Ray Schumacher.
     - Changed test.pl to work with new synset numbers
 
+0.72	Mon Dec 17 2001
+
+    - Fixed test.pl ... again ... to work with new synset numbers
+
+
 TODO:
     - methods for XML delivery of data
     - better reverse_morph() implementation

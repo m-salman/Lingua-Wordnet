@@ -10,8 +10,8 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = ( );
 @EXPORT = qw( );
-$VERSION = '0.71';
-$DICTDIR = '/usr/local/wordnet1.7/lingua-wordnet/';
+$VERSION = '0.72';
+$DICTDIR = '/usr/local/lingua-wordnet/';
 $DELIM = '||';
 $SUBDELIM = '|';
 
@@ -256,7 +256,7 @@ documentation for Lingua::Wordnet::Analysis.
 
 This will display a hypernym tree for $synset:
 
- my $synset = $wn->lookup_synset_offset("00300911%n"); 
+ my $synset = $wn->lookup_synset_offset("00333350%n"); 
  while ($synset = ($synset->hypernyms)[0]) {
     $i++;
     print " "x$i, "->", $synset->words, "\n";
