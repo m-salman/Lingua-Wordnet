@@ -40,7 +40,7 @@ else                     { print "not ok 4\n"; }
 if ($wn->familiarity("boy","n") == 4) { print "ok 5\n"; }
 else                                  { print "not ok 5\n"; }
 
-if ($wn->morph("bluest") eq "blue") { print "ok 6\n"; }
+if ($wn->morph("bluest","a") eq "blue") { print "ok 6\n"; }
 else                                { print "not ok 6\n"; }
 
 $wn->close();

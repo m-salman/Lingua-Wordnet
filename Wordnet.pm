@@ -2,7 +2,7 @@ package Lingua::Wordnet;
 
 require 5.005;
 use strict;
-use vars qw($VERSION @ISA @EXPORT_OK @EXPORT $DICTDIR);
+use vars qw($VERSION @ISA @EXPORT_OK @EXPORT $DICTDIR $DELIM $SUBDELIM);
 use DB_File;
 
 require Exporter;
@@ -10,8 +10,10 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = ( );
 @EXPORT = qw( );
-$VERSION = '0.1';
+$VERSION = '0.2';
 $DICTDIR = '/usr/local/wordnet1.6/lingua-wordnet/';
+$DELIM = '\|\|';
+$SUBDELIM = '\|';
 
 =head1 NAME
 
@@ -107,9 +109,9 @@ in the format: TEXT%SENSE, where TEXT is the word, and SENSE is the sense number
 Returns an integer of the familiarity/polysemy count for WORD in POS. Given a third value POLY_CNT, sets the polysemy count for WORD in POS. In Lingua::Wordnet, this is a value which must be updated by the user, and is not automatically modified. This makes it useful for recording familiarity or frequency counts outside of the Wordnet lexicons. Note that polysemy within Lingua::Wordnet can be identified for a given word by counting the synsets returned by lookup_synset().
 
 
-=item $wn->morph(WORD)
+=item $wn->morph(WORD, POS)
 
-Returns a form of WORD as found in the Wordnet morph files. The synset_lookup() functions performs morphological conversion automatically, so a call to morph() is not required.
+Returns a form of WORD in POS as found in the Wordnet morph files. The synset_lookup() functions performs morphological conversion automatically, so a call to morph() is not required.
 
 
 =item $synset->write()
@@ -410,26 +412,26 @@ sub overview {
 sub familiarity {
     my $self = shift;
     my ($word,$pos) = @_;
-    return (split(/\|\|/,$self->{indexhash}->{"$word\%$pos"}))[0];
+    return (split(/$DELIM/,$self->{indexhash}->{"$word\%$pos"}))[0];
 }
 
 sub lookup_synset {
     my $self = shift;
     my ($word,$pos,$num) = @_;
     if (!exists($self->{indexhash}->{"$word\%$pos"})) {
-        $word = $self->morph($word);
+        $word = $self->morph($word,$pos);
         if (!$word) { return; }
-        if (!exists(${$self->{indexhash}}->{"$word\%$pos"})) {
+        if (!exists($self->{indexhash}->{"$word\%$pos"})) {
             return;
         }
     }
     if ($pos && $num) {
-        my ($poly,$offsets) = split(/\|\|/,$self->{indexhash}->{"$word\%$pos"});
-        my $offset = (split(/\|/,$offsets))[$num-1] . "\%$pos";
+        my ($poly,$offsets) = split(/$DELIM/,$self->{indexhash}->{"$word\%$pos"});
+        my $offset = (split(/$SUBDELIM/,$offsets))[$num-1] . "\%$pos";
         return Lingua::Wordnet::Synset->new(\$self,$offset,$pos);
     } else {
-        my ($poly,$offsets) = split(/\|\|/,$self->{indexhash}->{"$word\%$pos"});
-        my @offsets = (split(/\|/,$offsets));
+        my ($poly,$offsets) = split(/$DELIM/,$self->{indexhash}->{"$word\%$pos"});
+        my @offsets = (split(/$SUBDELIM/,$offsets));
         my @synsets;
         foreach (@offsets) {
             push(@synsets,Lingua::Wordnet::Synset->new(\$self,"$_\%$pos",$pos)); 
@@ -447,7 +449,8 @@ sub lookup_synset_offset {
 sub morph {
     my $self = shift;
     my $word = shift;
-    return $self->{morphhash}->{$word};
+    my $pos = shift;
+    return $self->{morphhash}->{"$word\%$pos"};
 }
 
 sub grep {
@@ -471,8 +474,8 @@ sub new_synset {
     my $sense = 0;
     # assign a sense number
     if (exists($self->{indexhash}->{"$word\%$pos"})) {
-        my ($poly,$offsets) = split(/\|\|/,$self->{indexhash}->{"$word\%$pos"});
-        my @offsets = (split(/\|/,$offsets));
+        my ($poly,$offsets) = split(/$DELIM/,$self->{indexhash}->{"$word\%$pos"});
+        my @offsets = (split(/$SUBDELIM/,$offsets));
         $sense = scalar(@offsets);
     }
     $word = $word . "\%$sense";
@@ -583,7 +586,7 @@ sub new {
         $self->{offset} = $offset;
         $self->{pos} = substr($offset,length($offset)-1);
         ($self->{filenum},$self->{words},$self->{ptrs},$self->{frames},
-            $self->{gloss}) = split(/\|\|/,$data);
+            $self->{gloss}) = split(/$Lingua::Wordnet::DELIM/,$data);
     } else {
         $self->{offset} = "1\%$pos";
         $self->{pos} = $pos;
@@ -615,8 +618,8 @@ sub write {
         }
         # write the data entry
         ${$self->{wn}}->{datahash}->{$self->{offset}} = 
-            $self->{filenum} . "\|\|" . $self->{words} . "\|\|" .
-            $self->{ptrs} . "\|\|" . $self->{frames} . "\|\|" .
+            $self->{filenum} . "$Lingua::Wordnet::DELIM" . $self->{words} . "$Lingua::Wordnet::DELIM" .
+            $self->{ptrs} . "$Lingua::Wordnet::DELIM" . $self->{frames} . "$Lingua::Wordnet::DELIM" .
             $self->{gloss}; 
         # write the index entries
         my $word;
@@ -626,7 +629,7 @@ sub write {
                 # check if synset is already here
                 unless (${$self->{wn}}->{indexhash}->{$iword} =~ 
                          /$self->{offset}/) {
-                    ${$self->{wn}}->{indexhash}->{$iword} .= "\|" .  
+                    ${$self->{wn}}->{indexhash}->{$iword} .= "$Lingua::Wordnet::SUBDELIM" .  
                         $strippedoffset;
                 } 
             } else {
@@ -657,30 +660,30 @@ sub words {
     if (@newwords > 0) {
         @wordlist = @newwords;
     }
-    @wordlist = split(/\|/,$self->{words});
+    @wordlist = split(/$Lingua::Wordnet::SUBDELIM/,$self->{words});
     return @wordlist;
 }
 sub add_words {
     my $self = shift;
     my @newwords = shift;
     if (@newwords == 0) { return; }
-    my @wordlist = split(/\|/,$self->{words});
+    my @wordlist = split(/$Lingua::Wordnet::SUBDELIM/,$self->{words});
     push (@wordlist, @newwords);
-    $self->{words} = join("\|",@wordlist);
+    $self->{words} = join("$Lingua::Wordnet::SUBDELIM",@wordlist);
 }
 sub delete_words {
     my $self = shift;
     my @delwords = shift;
     my $word;
     if (@delwords == 0) { return; }
-    my @wordlist = split(/\|/,$self->{words});
+    my @wordlist = split(/$Lingua::Wordnet::SUBDELIM/,$self->{words});
     my @retwords;
     foreach $word (@wordlist) {
         unless (grep {$word} @delwords) {
             push(@retwords,$word);
         }
     }
-    $self->{words} = join("\|",@retwords);
+    $self->{words} = join("$Lingua::Wordnet::SUBDELIM",@retwords);
 }
 
 # standard synset functions
@@ -688,7 +691,7 @@ sub delete_words {
 sub synset_pointers {
     my ($self,$ptr) = @_;
     my @synsets = ();
-    foreach (split(/\|/,$self->{ptrs})) {
+    foreach (split(/$Lingua::Wordnet::SUBDELIM/,$self->{ptrs})) {
         /^$ptr\w*\s(\d+)\%(\w)\s(\d{4})/ && do {
             push(@synsets,Lingua::Wordnet::Synset->new($self->{wn},"$1\%$2"));
         };
@@ -702,7 +705,7 @@ sub add_synset_pointers {
         if ($self->{ptrs} =~ /^$ptr\s$synset->{offset}/) {
 
         } else {
-            $self->{ptrs} .= "\|$ptr $synset->{offset} 0000";
+            $self->{ptrs} .= "$Lingua::Wordnet::SUBDELIM$ptr $synset->{offset} 0000";
         }
     }
 }
@@ -710,9 +713,9 @@ sub delete_synset_pointers {
     my ($self,$ptr,@synsets) = @_;
     my $synset;
     foreach $synset (@synsets) {
-        $self->{ptrs} =~ s/$ptr\s$synset->{offset}\s\d{4}\|*//g;
+        $self->{ptrs} =~ s/$ptr\s$synset->{offset}\s\d{4}$Lingua::Wordnet::SUBDELIM*//g;
     }
-    $self->{ptrs} =~ s/\|$//;
+    $self->{ptrs} =~ s/$Lingua::Wordnet::SUBDELIM$//;
 }
 
 # antonyms: pointers are '!' (consistent)
@@ -1183,13 +1186,13 @@ sub lex_info {
 
 sub frames {
     my $self = shift;
-    my @frames = split(/\|/,$self->{frames});
+    my @frames = split(/$Lingua::Wordnet::SUBDELIM/,$self->{frames});
     my @frametext;
     my $frame;
     foreach $frame (@frames) {
         my ($fnum,$wnum) = split(/ /,$frame);
         if ($wnum > 0) {
-            my $wordtext = " (" . (split(/\|/,$self->{words}))[$wnum] . ")";
+            my $wordtext = " (" . (split(/$Lingua::Wordnet::SUBDELIM/,$self->{words}))[$wnum] . ")";
             push(@frametext,$vrbsents[$fnum] . $wordtext);
         } else {
             push(@frametext,$vrbsents[$fnum]);

@@ -6,3 +6,16 @@ Revision history for Perl extension Lingua::Wordnet.
 0.1   Mon Feb 2 1:28:30 2000
     - rewrote whole module
 
+0.2   Fri Apr 14 11:24:30 2000
+    - added pointer counting to 'scripts/report.pl'
+    - fixed examples for Wordnet::Lingua::Analysis::intersection() to 
+      use references
+    - added Wordnet::Lingua::Analysis::distance()
+    - changed Wordnet.pm and scripts/convertdb.pl to allow custom data
+      delimiters via the $DELIM and $SUBDELIM globals.
+    - made nested subs in Analysis.pm anonymous, thanks to Josef Meyer
+    - fixed lookup_synsets morphing, thanks to Melissa L. Holcombe
+    - changed morph() to require a POS, and convertdb.pl writes the 
+      morph database with POS labels.
+
+

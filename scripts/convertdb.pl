@@ -3,6 +3,9 @@
 use DB_File;
 use Fcntl;
 
+$DELIM = '\|\|';
+$SUBDELIM = '\|';
+
 #$DB_BTREE->{'flags'} = R_DUP;
 
 print "This program will convert your Wordnet databases into files usable by\nLingua::Wordnet. This will not affect your existing Wordnet files, but\nwill require up to 40MB disk space. Continue? [y]";
@@ -96,7 +99,7 @@ print "  Morph files:   \"adj.exc\"      => \"lingua_wordnet.morph\"\n";
 open FILE, "$datadir/adj.exc" or die "Couldn't open $datadir/adj.exc: $!";
 while (<FILE>) {
     my ($key,$value) = split(/\s/);
-    $hash{"$key"} = $value;
+    $hash{"$key\%a"} = $value;
 }
 close FILE;
 
@@ -106,7 +109,7 @@ open FILE, "$datadir/adv.exc" or die "Couldn't open $datadir/index.adv.exc:
 $!";
 while (<FILE>) {
    my ($key,$value) = split(/\s/);
-    $hash{"$key"} = $value;
+    $hash{"$key\%r"} = $value;
 }
 close FILE;
 
@@ -115,7 +118,7 @@ print "                 \"noun.exc\"    => \"lingua_wordnet.morph\"\n";
 open FILE, "$datadir/noun.exc" or die "Couldn't open $datadir/noun.exc: $!";
 while (<FILE>) {
     my ($key,$value) = split(/\s/);
-    $hash{"$key"} = $value;
+    $hash{"$key\%n"} = $value;
 }
 close FILE;
 
@@ -124,7 +127,7 @@ print "                 \"verb.exc\"    => \"lingua_wordnet.morph\"\n";
 open FILE, "$datadir/verb.exc" or die "Couldn't open $datadir/verb.exc: $!";
 while (<FILE>) {
     my ($key,$value) = split(/\s/);
-    $hash{"$key"} = $value;
+    $hash{"$key\%v"} = $value;
 }
 close FILE;
 

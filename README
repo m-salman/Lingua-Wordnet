@@ -27,9 +27,13 @@
 
 
 
-WARNING: This is a beta version. I have not extensively tested all
-functionality, particularly those functions allowing writing to
-the database. I know there are bugs. Please help me by finding them!
+NOTE: If you are upgrading from a previous version, you will need to 
+rebuild your Wordnet database files to accomodate the new morph() 
+function. See Changes for details. Also note that you can now specify 
+the characters used as delimiters in Wordnet.pm and convertdb.pl.
+
+This is beta software. Specifically, the add/modify synset functions are 
+not complete and require further testing.
 
 
 DESCRIPTION
@@ -101,6 +105,7 @@ DOCUMENTATION
 You can access the Lingua::Wordnet documentation with:
 
   perldoc Lingua::Wordnet
+  perldoc Lingua::Wordnet::Analysis
 
 There is additional documentation in the 'docs/' directory, and 
 the scripts in 'scripts/' are fairly good references for 
@@ -121,4 +126,7 @@ scripts/LWBrowser.pm      - an Apache/mod_perl module HTML font-end to
 scripts/report.pl         - generates statistics reports for databases
 
 
+TODOS
+
+- fully test and fix add_synset functions
 

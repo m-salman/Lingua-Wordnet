@@ -4,7 +4,7 @@ use strict;
 use Lingua::Wordnet;
 use vars qw($VERSION);
 
-$VERSION = "0.1";
+$VERSION = '0.2';
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ Lingua::Wordnet::Analysis - Perl extension for high-level processing of Wordnet 
 
  # How many articles of clothing have 'tongues'?
  $tongue = $wn->lookup_synset("tongue","n",2);
- @articles = $analysis->search($clothes->hyponyms,$tongue);
+ @articles = $analysis->search($clothes,$tongue,"all_meronyms");
  
  # Are there any parts, of any kinds, of any shoes, made of glass?
  @shoe_types = $analysis->traverse("hyponyms",$shoes);
@@ -27,7 +27,7 @@ Lingua::Wordnet::Analysis - Perl extension for high-level processing of Wordnet 
  # Compute the intersection of two lists of synsets
  @array1 = $shoes->all_holonyms;
  @intersect = $analysis->intersection
-       ($shoes->attributes,$socks->attributes);
+       (\@{$shoes->attributes},\@{$socks->attributes});
 
  # Generate a list of the inherited comp_meronyms for "apple"
  @apple_hypernyms = $analysis->traverse("hypernyms",$apple);
@@ -67,13 +67,16 @@ Returns a list of the coordinate sisters of SYNSET.
 Returns a list of synsets which is the union of synsets LIST. The union consists of synsets which occur in any lists. This is useful, for example, for determining all the holonyms for two or more synsets.
 
 
-=item $analysis->intersection(LIST)
+=item $analysis->intersection(ref LIST)
 
 Returns a list of synsets of the intersection of ARRAY1 list of synsets with ARRAY2 list of synsets. The intersection consists of synsets which occur in both lists. This is useful, for example, to determine which meronyms are shared by two synsets:
 
     @synsets = $analysis->intersection
-        ($synset1->all_meronyms,$synset2->all_meronyms);
+        (\@{$synset1->all_meronyms},\@{$synset2->all_meronyms});
 
+=item $analysis->distance(SYNSET1,SYNSET2,POINTER)
+
+Returns an integer value representing the distance in pointers between SYNSET1 and SYNSET2 using POINTER as the search path.
 
 =head1 EXAMPLES
 
@@ -135,6 +138,39 @@ sub match {
     return $match;
 }
 
+sub distance {
+    my $self = shift;
+    my $synset1 = shift;
+    my $matching = shift;
+    my $ptrtype = shift;
+    my @synsets = ( );
+    my $findit;
+    $findit = sub {
+        my $synset = shift;
+        my $matching = shift;
+        my $pointer = shift;
+        my $count = shift;
+        $count++;
+        my @synsets1 = ( );
+        my @list = ( );
+        my $found = 0;
+        eval("\@list = \$synset->$pointer");
+        die ($@) if ($@);
+        foreach (@list) {
+            if ($_->{offset} eq $matching->{offset}) {
+                return (1,$count);
+            } 
+            ($found,$count) = &{$findit}($_,$matching,$pointer,$count);
+            if ($found) { return (1,$count); }
+        }
+        return (0,$count);
+    };
+    my ($found,$count) = &{$findit}($synset1,$matching,$ptrtype,0);
+    if ($found) { return $count; }
+    else { return 0; }
+
+}
+
 sub search {
     my $self = shift;
     my $synset1 = shift;
@@ -142,10 +178,8 @@ sub search {
     my $ptrtype = shift;
     my $lastsynset;
     my @synsets;
-    matchit($synset1);
-    return @synsets;
-
-    sub matchit {
+    my $matchit;
+    $matchit = sub {
         my $synset = shift;
         my @list;
         eval("\@list = \$synset->$ptrtype");
@@ -155,9 +189,11 @@ sub search {
                 push (@synsets,$lastsynset);
             }
             $lastsynset = $_;
-            matchit($_);
+            &{$matchit}($_);
         }
-    }
+    };
+    &{$matchit}($synset1);
+    @synsets;
 }
 
 sub traverse {
@@ -165,12 +201,8 @@ sub traverse {
     my $ptrtype = shift;
     my @synsets = ( );
     my %hash;
-    foreach (@_) {
-        push @synsets, traverseit($_,$ptrtype);
-    }
-    return @synsets;
-
-    sub traverseit {
+    my $traverseit;
+    $traverseit = sub {
         my $synset = shift;
         my $pointer = shift;
         my @synsets1 = ( );
@@ -180,12 +212,16 @@ sub traverse {
         foreach (@list) {
             unless (exists $hash{$_}) {
                 push @synsets1, $_;
-                push @synsets1, traverseit($_,$pointer);
+                push @synsets1, &{$traverseit}($_,$pointer);
                 $hash{$_->{offset}} = "";
             }
         }
-        return @synsets1;
+        @synsets1;
+    };
+    foreach (@_) {
+        push @synsets, &{$traverseit}($_,$ptrtype);
     }
+    @synsets;
 }
 
 sub coordinates {
