@@ -25,6 +25,7 @@
 
         foreach my $synset (@synsets) {
             print "words: ", $synset->words, "\n";
+            print "offset: ", $synset->offset, "\n";
             print "pos: ", $synset->pos, "\n";
             print "gloss: ", $synset->gloss, "\n";
             print "frames: ", $synset->frames, "\n\n";

@@ -10,8 +10,8 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = ( );
 @EXPORT = qw( );
-$VERSION = '0.7';
-$DICTDIR = '/usr/local/wordnet1.6/lingua-wordnet/';
+$VERSION = '0.71';
+$DICTDIR = '/usr/local/wordnet1.7/lingua-wordnet/';
 $DELIM = '||';
 $SUBDELIM = '|';
 

@@ -17,20 +17,20 @@ if (shift(@ARGV) =~ /DICTDIR=(.*)\s*$/) {
     $datadir = $1;
 }
 if (!$datadir) {
-    print "Data directory: [/usr/local/wordnet1.6/dict/] ";
+    print "Data directory: [/usr/local/wordnet1.7/dict/] ";
     $datadir = (<STDIN>);
     chop $datadir; 
-    if (!$datadir) { $datadir = "/usr/local/wordnet1.6/dict/" }
+    if (!$datadir) { $datadir = "/usr/local/wordnet1.7/dict/" }
 }
 if (!-e "$datadir/data.noun") {
     die "Directory $datadir doesn't exist, or doesn't contain the proper data
 files.";
 }
 
-print "Lingua::Wordnet needs to write the new files to a data directory.\nWhere do you want these files saved?\n[/usr/local/wordnet1.6/lingua-wordnet/] ";
+print "Lingua::Wordnet needs to write the new files to a data directory.\nWhere do you want these files saved?\n[/usr/local/wordnet1.7/lingua-wordnet/] ";
 $newdir = <STDIN>;
 chop $newdir;
-if (!$newdir) { $newdir = "/usr/local/wordnet1.6/lingua-wordnet/"; }
+if (!$newdir) { $newdir = "/usr/local/wordnet1.7/lingua-wordnet/"; }
 if (!-d $newdir) {
     print "$newdir doesn't exist. Create it? [y] ";
     if (<STDIN> =~ /^n/i) { exit(0); }
@@ -135,12 +135,17 @@ close FILE;
 
 print "                 \"cousin.exc\"  => \"lingua_wordnet.morph\"\n";
 
-open FILE, "$datadir/cousin.exc" or die "Couldn't open $datadir/cousin.exc: $!";
+open FILE, "$datadir/cousin.exc" or do {
+    print "                     \"cousin.exc\" not found ... skipping (1.7?)\n";
+    goto SKIP_COUSIN;
+};
 while (<FILE>) {
     my ($key,$value) = split(/\s/);
     $hash{"$key"} = $value;
 }
 close FILE;
+
+SKIP_COUSIN:
 
 untie %hash;
 

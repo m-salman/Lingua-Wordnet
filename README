@@ -38,7 +38,7 @@ script.
 
 REQUIREMENTS
 
-Perl 5.005, Berkeley DB 1.*, Wordnet 1.6 are required. The Wordnet 
+Perl 5.005, Berkeley DB 1.*, Wordnet 1.6/1.7 are required. The Wordnet 
 distribution does not need to be installed, but the data files 
 must be accessible for creation of the new database files. Wordnet 
 is available from http://www.cogsci.princeton.edu/~wn/.
@@ -52,7 +52,7 @@ To configure and install, type:
 
 Next, run the script 'scripts/convertdb.pl' to rewrite the data in Berkeley 
 DB format. It will also ask where you want to new data files stored 
-(default is /usr/local/wordnet1.6/lingua-wordnet/). It will write
+(default is /usr/local/wordnet1.7/lingua-wordnet/). It will write
 the following files, and will take quite a while:
 
     lingua_wordnet.index      - all indexes of all senses

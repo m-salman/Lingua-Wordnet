@@ -4,7 +4,7 @@ use strict;
 use Lingua::Wordnet;
 use vars qw($VERSION);
 
-$VERSION = '0.7';
+$VERSION = '0.71';
 
 =head1 NAME
 

@@ -10,7 +10,7 @@ print "ok 1\n";
 
 $wn = new Lingua::Wordnet;
 
-my $synset = $wn->lookup_synset_offset("00300911%n");
+my $synset = $wn->lookup_synset_offset("00333350%n");
 
 if ($synset) { print "ok 2\n"; }
 else         { print "not ok 2\n"; }

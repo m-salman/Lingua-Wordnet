@@ -68,6 +68,23 @@ Revision history for Perl extension Lingua::Wordnet.
     - Changed 'scripts/convertdb.pl' to try harder to update paths in 
       Wordnet.pm
 
+0.71   Mon Aug 13 2001
+
+    * This release is compatible with Wordnet 1.7, but requires a rebuild of 
+      the data files. Wordnet 1.7 changes include new file byte offsets; these 
+      do not map to 1.6 offsets, and this module performs no conversion (no 
+      access to the "Sense Map" package). Additionally, some sense numbers
+      have changed.
+
+      This release should still be compatible with 1.6, but includes no 
+      features that enhance 1.6.
+
+    - 1.7 does not have a "cousin.exc" list; caused the conversion script to 
+      not choke as a result.
+    - Added a script 'scripts/convertdb_win.pl' for Win32 compatibility; thanks 
+      to Ray Schumacher.
+    - Changed test.pl to work with new synset numbers
+
 TODO:
     - methods for XML delivery of data
     - better reverse_morph() implementation
