@@ -3,8 +3,8 @@
 use DB_File;
 use Fcntl;
 
-$DELIM = '\|\|';
-$SUBDELIM = '\|';
+$DELIM = '||';
+$SUBDELIM = '|';
 
 #$DB_BTREE->{'flags'} = R_DUP;
 
@@ -258,10 +258,10 @@ sub formatindex {
         print "WARNING: index entry did not parse: $string\n";
     }
     
-    $synset_offsets = join("\|",@synsets);
+    $synset_offsets = join($SUBDELIM,@synsets);
     my $key = "$lemma\%$pos";
     #$poly_cnt||$synset_offsets
-    my $data = "$poly_cnt||$synset_offsets";
+    my $data = "$poly_cnt$DELIM$synset_offsets";
     return ($key,$data);
 }
 
@@ -279,11 +279,11 @@ sub formatsynset {
             if ($string =~ /\G(\S+)\s(\w)*\s*/g) {
                 my $word = $1;
                 my $lex_id = $2;
-                $words .= "|$word\%$lex_id";
+                $words .= "$SUBDELIM$word\%$lex_id";
             } else {
                 $okparse = 0;
             }
-            $words =~ s/^\|//;
+            $words =~ s/^\Q$SUBDELIM//;
         }
         if ($string =~ /\G(\d{3})\s/g) {
             $p_cnt = $1;
@@ -294,12 +294,12 @@ sub formatsynset {
                     $ptroffset = $2; 
                     $ptrpos = $3;
                     $ptrsrc = $4;
-                    $ptrs .= "|$ptrsym $ptroffset\%$ptrpos $ptrsrc";
+                    $ptrs .= "$SUBDELIM$ptrsym $ptroffset\%$ptrpos $ptrsrc";
                 } else {
                     $okparse = 0;
                 }
             }
-            $ptrs =~ s/^\|//;
+            $ptrs =~ s/^\Q$SUBDELIM//;
         } else {
             $okparse = 0;
         }
@@ -311,12 +311,12 @@ sub formatsynset {
                     if ($string =~ /\G\+\s(\d{2})\s(\w{2})\s/g) {
                         $f_num = $1;
                         $w_num = $2; 
-                        $frames .= "|$f_num $w_num";
+                        $frames .= "$SUBDELIM$f_num $w_num";
                     } else {
                         $okparse = 0;
                     }
                 }
-                $frames =~ s/^\|//;
+                $frames =~ s/^\Q$SUBDELIM//;
             } else {
                 $okparse = 0;
             }
@@ -334,7 +334,7 @@ sub formatsynset {
     #$filenum||$pos||$ss_type||$words||$prts||$frames||$gloss
     if ($ss_type eq "s") { $ss_type = "a"; }
     $key = "$offset\%$ss_type";
-    $data = "$filenum||$words||$ptrs||$frames||$gloss";
+    $data = "$filenum$DELIM$words$DELIM$ptrs$DELIM$frames$DELIM$gloss";
     return($key,$data);
 }
 

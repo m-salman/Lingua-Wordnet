@@ -29,8 +29,9 @@
 
 NOTE: If you are upgrading from a previous version, you will need to 
 rebuild your Wordnet database files to accomodate the new morph() 
-function. See Changes for details. Also note that you can now specify 
-the characters used as delimiters in Wordnet.pm and convertdb.pl.
+function and delimiter format. See Changes for details. Also note that you 
+can now specify the characters used as delimiters in Wordnet.pm and 
+convertdb.pl.
 
 This is beta software. Specifically, the add/modify synset functions are 
 not complete and require further testing.
@@ -45,7 +46,7 @@ well as manipulation and extension of the lexicon.
 Lingua::Wordnet::Analysis provides numerous high-level 
 extensions to the system.
 
-Version 0.1 is a complete rewrite of the module in pure Perl, 
+Version 0.1 was a complete rewrite of the module in pure Perl, 
 whereas the old module embedded the Wordnet C API functions. 
 In order to use the module, the database files must first be 
 converted to Berkeley DB files using the 'scripts/convertdb.pl' 
@@ -124,9 +125,11 @@ docs/terms.txt            - a brief summary of Wordnet terms
 scripts/LWBrowser.pm      - an Apache/mod_perl module HTML font-end to 
                             Lingua::Wordnet.
 scripts/report.pl         - generates statistics reports for databases
-
+scripts/10questions.pl    - demonstrates Analysis.pm with a game of 
+                            "10 Questions"
 
 TODOS
 
 - fully test and fix add_synset functions
+- add more tests
 

@@ -4,7 +4,7 @@ use strict;
 use Lingua::Wordnet;
 use vars qw($VERSION);
 
-$VERSION = '0.2';
+$VERSION = '0.3';
 
 =head1 NAME
 
@@ -42,7 +42,7 @@ These functions could have been put into Lingua::Wordnet::Synset objects, but I 
 
 =head1 Lingua::Wordnet::Analysis functions
 
-=item $analysis->match(ARRAY,SYNSET)
+=item $analysis->match(SYNSET,ARRAY)
 
 Finds any occurance of SYNSET in the synset list ARRAY and the list's pointers. Returns a positive value if a match is found. match() does not traverse.
 
@@ -52,7 +52,7 @@ Finds any occurance of SYNSET in the synset list ARRAY and the list's pointers. 
 Searches all pointers of type POINTER in SYNSET1 for SYNSET2. search() is recursive, and will traverse all depths. Returns the number of matches.
     
 
-=item $analysis->traverse(SYNSET,POINTER)
+=item $analysis->traverse(POINTER,SYNSET)
 
 Traverses all pointer types of POINTER in SYNSET and returns a list of all synsets found in the tree.
 
@@ -127,11 +127,10 @@ sub new {
 sub match {
     my $self = shift;
     my $synset = shift;
-    my @synsets = shift;
+    my @synsets = @_;
     my $match = 0;
     foreach (@synsets) {
-        if (index $_->{ptrs}, $synset->{offset} ||
-            $_->{offset} eq $synset->{offset}) {
+        if ($_->{offset} eq $synset->{offset}) {
             $match++;
         }
     }

@@ -10,10 +10,10 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = ( );
 @EXPORT = qw( );
-$VERSION = '0.2';
+$VERSION = '0.3';
 $DICTDIR = '/usr/local/wordnet1.6/lingua-wordnet/';
-$DELIM = '\|\|';
-$SUBDELIM = '\|';
+$DELIM = '||';
+$SUBDELIM = '|';
 
 =head1 NAME
 
@@ -29,7 +29,7 @@ Lingua::Wordnet - Perl extension for accessing and manipulating Wordnet database
   $wn->unlock();
   $synset = $wn->lookup_synset("canary","n",4);
   $synset2 = $wn->lookup_synset("small","a",1);
-  $synset->add_attribute($synset2);
+  $synset->add_attributes($synset2);
   $synset->write();
   $wn->close();
 
@@ -50,7 +50,7 @@ Version 1.0 is a complete rewrite of the module in pure Perl, whereas the old mo
 - A pure Perl implementation allows easier debugging and modification for people who want to experiment or alter the processing.
 
 
-With that said, there are actually two modules. Lingua::Wordnet impersonates the basic Wordnet API functions for searching and retrieving data, as well as adding, editing, and deleting synsets. Lingua::Wordnet::Analysis brings the interface up a level, allowing commands like "is 'yellow' an attribute of any 'birds'", and taking care of the recursive analysis. Please refer to the respective man pages for the other two modules.
+With that said, there are actually two modules. Lingua::Wordnet impersonates the basic Wordnet API functions for searching and retrieving data, as well as adding, editing, and deleting synsets. Lingua::Wordnet::Analysis brings the interface up a level, allowing commands like "is 'yellow' an attribute of any 'birds'", and taking care of the recursive analysis.
 
 
 =head1 Lingua::Wordnet functions
@@ -127,7 +127,7 @@ function name. These functions accept a synset object or objects as input. Unles
  $synset->add_antonyms($synset2[, ...])
  $synset->delete_antonyms($synset2[, ...])
 
-Returns, adds, or deletes antonyms for $synset. If a value is added or deleted, antonyms() will also add entries to the added synsets to maintain consistency when $synset->write() is called.
+Returns, adds, or deletes antonyms for $synset. If a value is added or deleted, antonyms() will also add entries to the added synsets to maintain consistency when $synset->write() is called. WARNING: Throughout this doc the claim is made that this consistency is automated. It isn't. It will be soon.
 
 
 =item $synset->hypernyms()
@@ -331,21 +331,21 @@ Remember, proceeded most synset functions with "add" will append the supplied da
 Rather than add the new synset to the hyponyms of "baseball", we could have added "baseball" to the hypernyms of the new synset "fooball", since links are always kept synchronized:
 
 
- $newsynset->hypernyms($synset);
+ $newsynset->add_hypernyms($synset);
 
 
 We could add an attribute 'fun' to "fooball" thus (not necessarily recommended pointer, but it will suffice for an example):
 
 
  $fun_synset = $wn->lookup_synset("fun","adj",1);
- $newsynset->add_attribute($fun_synset);
+ $newsynset->add_attributes($fun_synset);
 
 
 See the Lingua::Wordnet::Analysis documentation for examples to retrieving and searching entire trees and inheritance functions.
 
 =head1 BUGS/TODO
 
-Please send bugs and suggestions/requests to dbrian@clockwork.net. Development on this module is active as of Winter 2000.
+Please send bugs and suggestions/requests to dbrian@brians.org. Development on this module is active as of Spring 2000.
 
 Clean up code, put references where beneficial.
 
@@ -412,7 +412,7 @@ sub overview {
 sub familiarity {
     my $self = shift;
     my ($word,$pos) = @_;
-    return (split(/$DELIM/,$self->{indexhash}->{"$word\%$pos"}))[0];
+    return (split(/\Q$DELIM/,$self->{indexhash}->{"$word\%$pos"}))[0];
 }
 
 sub lookup_synset {
@@ -426,12 +426,12 @@ sub lookup_synset {
         }
     }
     if ($pos && $num) {
-        my ($poly,$offsets) = split(/$DELIM/,$self->{indexhash}->{"$word\%$pos"});
-        my $offset = (split(/$SUBDELIM/,$offsets))[$num-1] . "\%$pos";
+        my ($poly,$offsets) = split(/\Q$DELIM/,$self->{indexhash}->{"$word\%$pos"});
+        my $offset = (split(/\Q$SUBDELIM/,$offsets))[$num-1] . "\%$pos";
         return Lingua::Wordnet::Synset->new(\$self,$offset,$pos);
     } else {
-        my ($poly,$offsets) = split(/$DELIM/,$self->{indexhash}->{"$word\%$pos"});
-        my @offsets = (split(/$SUBDELIM/,$offsets));
+        my ($poly,$offsets) = split(/\Q$DELIM/,$self->{indexhash}->{"$word\%$pos"});
+        my @offsets = (split(/\Q$SUBDELIM/,$offsets));
         my @synsets;
         foreach (@offsets) {
             push(@synsets,Lingua::Wordnet::Synset->new(\$self,"$_\%$pos",$pos)); 
@@ -474,8 +474,8 @@ sub new_synset {
     my $sense = 0;
     # assign a sense number
     if (exists($self->{indexhash}->{"$word\%$pos"})) {
-        my ($poly,$offsets) = split(/$DELIM/,$self->{indexhash}->{"$word\%$pos"});
-        my @offsets = (split(/$SUBDELIM/,$offsets));
+        my ($poly,$offsets) = split(/\Q$DELIM/,$self->{indexhash}->{"$word\%$pos"});
+        my @offsets = (split(/\Q$SUBDELIM/,$offsets));
         $sense = scalar(@offsets);
     }
     $word = $word . "\%$sense";
@@ -586,7 +586,7 @@ sub new {
         $self->{offset} = $offset;
         $self->{pos} = substr($offset,length($offset)-1);
         ($self->{filenum},$self->{words},$self->{ptrs},$self->{frames},
-            $self->{gloss}) = split(/$Lingua::Wordnet::DELIM/,$data);
+            $self->{gloss}) = split(/\Q$Lingua::Wordnet::DELIM/,$data);
     } else {
         $self->{offset} = "1\%$pos";
         $self->{pos} = $pos;
@@ -607,7 +607,7 @@ sub write {
     if (${$self->{wn}}->{lock} == 1) {
         die "write() not allowed while Wordnet object is locked."
     } else {
-        ${$self->{wn}}->{datahash}->{"dgb3"} = 1;
+        # ${$self->{wn}}->{datahash}->{"dgb3"} = 1;
         # check if this is a new synset, give it an offset if so
         if ($self->{offset} =~ /^1\%(\w)$/) {
             ${$self->{wn}}->{datahash}->{offsetcount}++;
@@ -633,7 +633,7 @@ sub write {
                         $strippedoffset;
                 } 
             } else {
-                ${$self->{wn}}->{indexhash}->{$iword} = "1||" . $strippedoffset;
+                ${$self->{wn}}->{indexhash}->{$iword} = "1$Lingua::Wordnet::DELIM" . $strippedoffset;
             }
         }
     }
@@ -660,14 +660,14 @@ sub words {
     if (@newwords > 0) {
         @wordlist = @newwords;
     }
-    @wordlist = split(/$Lingua::Wordnet::SUBDELIM/,$self->{words});
+    @wordlist = split(/\Q$Lingua::Wordnet::SUBDELIM/,$self->{words});
     return @wordlist;
 }
 sub add_words {
     my $self = shift;
     my @newwords = shift;
     if (@newwords == 0) { return; }
-    my @wordlist = split(/$Lingua::Wordnet::SUBDELIM/,$self->{words});
+    my @wordlist = split(/\Q$Lingua::Wordnet::SUBDELIM/,$self->{words});
     push (@wordlist, @newwords);
     $self->{words} = join("$Lingua::Wordnet::SUBDELIM",@wordlist);
 }
@@ -676,7 +676,7 @@ sub delete_words {
     my @delwords = shift;
     my $word;
     if (@delwords == 0) { return; }
-    my @wordlist = split(/$Lingua::Wordnet::SUBDELIM/,$self->{words});
+    my @wordlist = split(/\Q$Lingua::Wordnet::SUBDELIM/,$self->{words});
     my @retwords;
     foreach $word (@wordlist) {
         unless (grep {$word} @delwords) {
@@ -691,7 +691,7 @@ sub delete_words {
 sub synset_pointers {
     my ($self,$ptr) = @_;
     my @synsets = ();
-    foreach (split(/$Lingua::Wordnet::SUBDELIM/,$self->{ptrs})) {
+    foreach (split(/\Q$Lingua::Wordnet::SUBDELIM/,$self->{ptrs})) {
         /^$ptr\w*\s(\d+)\%(\w)\s(\d{4})/ && do {
             push(@synsets,Lingua::Wordnet::Synset->new($self->{wn},"$1\%$2"));
         };
@@ -712,10 +712,11 @@ sub add_synset_pointers {
 sub delete_synset_pointers {
     my ($self,$ptr,@synsets) = @_;
     my $synset;
+    my $delim = "$Lingua::Wordnet::SUBDELIM";
     foreach $synset (@synsets) {
-        $self->{ptrs} =~ s/$ptr\s$synset->{offset}\s\d{4}$Lingua::Wordnet::SUBDELIM*//g;
+        $self->{ptrs} =~ s/(?:$delim)*$ptr\s$synset->{offset}\s\d{4}//g;
     }
-    $self->{ptrs} =~ s/$Lingua::Wordnet::SUBDELIM$//;
+    $self->{ptrs} =~ s/^\Q$Lingua::Wordnet::SUBDELIM//;
 }
 
 # antonyms: pointers are '!' (consistent)
@@ -753,7 +754,7 @@ sub delete_hypernyms {
 # entailment: pointers are '*' (consistent)
 sub entailment {
     my $self = shift;
-    return synset_pointers($self,"\\*");    
+    return synset_pointers($self,'\*');    
 }
 sub add_entailment {
     my $self = shift;
@@ -763,7 +764,7 @@ sub add_entailment {
 sub delete_entailment {
     my $self = shift;
     my @delete_synsets = @_;
-    delete_synset_pointers($self,"\\*",@delete_synsets);
+    delete_synset_pointers($self,'\*',@delete_synsets);
 }
 
 # hyponyms: pointers are '~' (consistent)
@@ -1048,7 +1049,7 @@ sub delete_causes {
 # verb group: pointers are '$' (consistent)
 sub verb_group {
     my $self = shift;
-    return synset_pointers($self,"\$");
+    return synset_pointers($self,'\$');
 }
 sub add_verb_group {
     my $self = shift;
@@ -1058,13 +1059,13 @@ sub add_verb_group {
 sub delete_verb_group {
     my $self = shift;
     my @delete_synsets = @_;
-    delete_synset_pointers($self,"\$",@delete_synsets);
+    delete_synset_pointers($self,'\$',@delete_synsets);
 }
 
 # similar to: pointers are '&' (consistent)
 sub similar_to {
     my $self = shift;
-    return synset_pointers($self,"\&");
+    return synset_pointers($self,'\&');
 }
 sub add_similar_to {
     my $self = shift;
@@ -1074,7 +1075,7 @@ sub add_similar_to {
 sub delete_similar_to {
     my $self = shift;
     my @delete_synsets = @_;
-    delete_synset_pointers($self,"\&",@delete_synsets);
+    delete_synset_pointers($self,'\&',@delete_synsets);
 }
 
 # participle of verb: pointers are '<' (consistent)
@@ -1112,7 +1113,7 @@ sub delete_pertainyms {
 # attribute: pointers are '=' (consistent, but now also nouns)
 sub attributes {
     my $self = shift;
-    return synset_pointers($self,"=");
+    return synset_pointers($self,"\=");
 }
 sub add_attributes {
     my $self = shift;
@@ -1144,7 +1145,7 @@ sub delete_derived_from_adj {
 # also see: pointers are '^' (consistent)
 sub also_see {
     my $self = shift;
-    return synset_pointers($self,"^");
+    return synset_pointers($self,'\^');
 }
 sub add_see_also {
     my $self = shift;
@@ -1154,7 +1155,7 @@ sub add_see_also {
 sub delete_see_also {
     my $self = shift;
     my @delete_synsets = @_;
-    delete_synset_pointers($self,"^",@delete_synsets);
+    delete_synset_pointers($self,'\^',@delete_synsets);
 }
 
 # function: pointers are '+' (new)
@@ -1166,17 +1167,17 @@ sub delete_see_also {
 # But not now. :)
 sub functions {
     my $self = shift;
-    return synset_pointers($self,"+");
+    return synset_pointers($self,'\+');
 }
 sub add_functions {
     my $self = shift;
     my @add_synsets = @_;
-    add_synset_pointers($self,"+",@add_synsets);
+    add_synset_pointers($self,"\+",@add_synsets);
 }
 sub delete_functions {
     my $self = shift;
     my @delete_synsets = @_;
-    delete_synset_pointers($self,"+",@delete_synsets);
+    delete_synset_pointers($self,'\+',@delete_synsets);
 }
 
 sub lex_info {
@@ -1186,13 +1187,13 @@ sub lex_info {
 
 sub frames {
     my $self = shift;
-    my @frames = split(/$Lingua::Wordnet::SUBDELIM/,$self->{frames});
+    my @frames = split(/\Q$Lingua::Wordnet::SUBDELIM/,$self->{frames});
     my @frametext;
     my $frame;
     foreach $frame (@frames) {
         my ($fnum,$wnum) = split(/ /,$frame);
         if ($wnum > 0) {
-            my $wordtext = " (" . (split(/$Lingua::Wordnet::SUBDELIM/,$self->{words}))[$wnum] . ")";
+            my $wordtext = " (" . (split(/\Q$Lingua::Wordnet::SUBDELIM/,$self->{words}))[$wnum] . ")";
             push(@frametext,$vrbsents[$fnum] . $wordtext);
         } else {
             push(@frametext,$vrbsents[$fnum]);

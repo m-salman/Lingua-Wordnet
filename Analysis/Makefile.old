@@ -45,9 +45,9 @@ AR_STATIC_ARGS = cr
 NAME = Lingua::Wordnet::Analysis
 DISTNAME = Lingua-Wordnet-Analysis
 NAME_SYM = Lingua_Wordnet_Analysis
-VERSION = 0.2
-VERSION_SYM = 0_2
-XS_VERSION = 0.2
+VERSION = 0.3
+VERSION_SYM = 0_3
+XS_VERSION = 0.3
 INST_BIN = ../blib/bin
 INST_EXE = ../blib/script
 INST_LIB = ../blib/lib
@@ -436,7 +436,7 @@ testdb_static :: testdb_dynamic
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd:
-	@$(PERL) -e "print qq{<SOFTPKG NAME=\"Lingua-Wordnet-Analysis\" VERSION=\"0,2,0,0\">\n}. qq{\t<TITLE>Lingua-Wordnet-Analysis</TITLE>\n}. qq{\t<ABSTRACT></ABSTRACT>\n}. qq{\t<AUTHOR></AUTHOR>\n}. qq{\t<IMPLEMENTATION>\n}. qq{\t\t<OS NAME=\"$(OSNAME)\" />\n}. qq{\t\t<ARCHITECTURE NAME=\"i386-linux\" />\n}. qq{\t\t<CODEBASE HREF=\"\" />\n}. qq{\t</IMPLEMENTATION>\n}. qq{</SOFTPKG>\n}" > Lingua-Wordnet-Analysis.ppd
+	@$(PERL) -e "print qq{<SOFTPKG NAME=\"Lingua-Wordnet-Analysis\" VERSION=\"0,3,0,0\">\n}. qq{\t<TITLE>Lingua-Wordnet-Analysis</TITLE>\n}. qq{\t<ABSTRACT></ABSTRACT>\n}. qq{\t<AUTHOR></AUTHOR>\n}. qq{\t<IMPLEMENTATION>\n}. qq{\t\t<OS NAME=\"$(OSNAME)\" />\n}. qq{\t\t<ARCHITECTURE NAME=\"i386-linux\" />\n}. qq{\t\t<CODEBASE HREF=\"\" />\n}. qq{\t</IMPLEMENTATION>\n}. qq{</SOFTPKG>\n}" > Lingua-Wordnet-Analysis.ppd
 
 # --- MakeMaker pm_to_blib section:
 
