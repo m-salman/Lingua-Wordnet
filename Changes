@@ -38,3 +38,10 @@ Revision history for Perl extension Lingua::Wordnet.
       Lingua::Wordnet::Synset; you can print '$synset' directly 
       and get an overview for the synset; it uses 'overview()'
     - added test of overloaded behavior
+
+
+0.6
+    - Changed the overload syntax in Wordnet.pm (line 559) to work 
+      for Perl < 5.6.
+    - Fixed some typos in 'scripts/10questions.pl'
+

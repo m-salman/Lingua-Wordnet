@@ -10,7 +10,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = ( );
 @EXPORT = qw( );
-$VERSION = '0.5';
+$VERSION = '0.6';
 $DICTDIR = '/usr/local/wordnet';
 $DELIM = '||';
 $SUBDELIM = '|';
@@ -556,7 +556,7 @@ my @vrbsents = (
 
 package Lingua::Wordnet::Synset;
 
-use overload qw("") => overview;
+use overload qw("") => \&overview;
 
 sub new {
     my $class = shift;
