@@ -29,6 +29,12 @@ Revision history for Perl extension Lingua::Wordnet.
     - removed plan to automate the synchronization of corrsponding 
       pointer types
     - more POD updates and typos
-    - added a small 'wn.pl' script to 'scripts/' to illustrate the most 
-      basic usage
+    - added a small 'wn.pl' script to 'scripts/' to illustrate the 
+      most basic usage
 
+0.5   Thu Aug 31 20:07:54 2000
+    - added 'overview' method due to popular demand
+    - overloaded stringify operators ("") for class 
+      Lingua::Wordnet::Synset; you can print '$synset' directly 
+      and get an overview for the synset; it uses 'overview()'
+    - added test of overloaded behavior

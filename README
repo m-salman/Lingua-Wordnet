@@ -1,36 +1,15 @@
-    Perl Lingua::Wordnet
-    Copyright (c) 1999,2000 Daniel Brian. All rights reserved.
+  ==================================================================
+  Lingua::Wordnet
+  Copyright 1999,2000 by Dan Brian.
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of either:
-
-    a) the GNU General Public License as published by the Free
-    Software Foundation; either version 1, or (at your option) any
-    later version, or
-
-    b) the "Artistic License" which comes with this kit.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
-    the GNU General Public License or the Artistic License for more details.
-
-    You should have received a copy of the Artistic License with this kit,
-    in the file named "Artistic".  If not, you can get one from the Perl
-    distribution. You should also have received a copy of the GNU General
-    Public License, in the file named "Copying". If not, you can get one
-    from the Perl distribution or else write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
-    NOTE: Wordnet is not included in this package. It is copyrighted 
-    by Princeton University (see http://www.cogsci.princeton.edu/~wn/).
-
+  This program is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+  ==================================================================  
 
 
 NOTE: If you are upgrading from a previous version, you may need to 
 rebuild your Wordnet database files to accomodate new or changed 
 functions. See Changes for details.
-
 
 
 DESCRIPTION
@@ -53,7 +32,7 @@ REQUIREMENTS
 
 Perl 5.005, Berkeley DB 1.*, Wordnet 1.6 are required. The Wordnet 
 distribution does not need to be installed, but the data files 
-must be accessible for creation of the new data files. Wordnet 
+must be accessible for creation of the new database files. Wordnet 
 is available from http://www.cogsci.princeton.edu/~wn/.
 
 

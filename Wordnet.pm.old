@@ -10,7 +10,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = ( );
 @EXPORT = qw( );
-$VERSION = '0.5';
+$VERSION = '0.4';
 $DICTDIR = '/usr/local/wordnet';
 $DELIM = '||';
 $SUBDELIM = '|';
@@ -29,7 +29,6 @@ Lingua::Wordnet - Perl extension for accessing and manipulating Wordnet database
   $synset2 = $wn->lookup_synset("small","a",1);
   $synset->add_attributes($synset2);
   $synset->write();
-  print $synset, "\n";
   $wn->close();
 
 =head1 DESCRIPTION
@@ -57,6 +56,11 @@ With that said, there are actually two modules. Lingua::Wordnet impersonates the
 =item $wn = new Lingua::Wordnet( [DATA_DIR] );
 
 Creates and assigns a new object of class Lingua::Wordnet. DATA_DIR is optional, and indicates the location of the index and data files. 
+
+
+=item $wn->overview(TEXT)
+
+Returns a string containing an overview of TEXT in all parts of speech.
 
 
 =item $wn->unlock()
@@ -106,11 +110,6 @@ Returns an integer of the familiarity/polysemy count for WORD in POS. Given a th
 =item $wn->morph(WORD, POS)
 
 Returns a form of WORD in POS as found in the Wordnet morph files. The synset_lookup() functions performs morphological conversion automatically, so a call to morph() is not required.
-
-
-=item $synset->overview()
-
-Returns the terms and gloss for the synset in a format for printing. This method is also used to overload a print performed on the synset. Note that this is different from the "overview" parameter of the 'wn' executable, since it only returns information about the current synset.
 
 
 =item $synset->write()
@@ -342,7 +341,9 @@ Clean up code, put references where beneficial.
 
 =head1 AUTHOR
 
-Dan Brian <dbrian@brians.org>
+Copyright (C)2000, Daniel Brian.
+
+D. Brian, dbrian@brians.org.
 
 =head1 SEE ALSO
 
@@ -392,6 +393,11 @@ sub DESTROY {
 sub close {
     my $self = shift;
     $self->DESTROY();
+}
+
+# Anybody want to write an overview()? Please send it to me.
+sub overview {
+
 }
 
 sub familiarity {
@@ -556,8 +562,6 @@ my @vrbsents = (
 
 package Lingua::Wordnet::Synset;
 
-use overload qw("") => overview;
-
 sub new {
     my $class = shift;
     my ($wn,$offset,$pos,$word) = @_;
@@ -585,15 +589,6 @@ sub new {
     }
     #lex_filenum||words||pointers||frames||gloss
     return $self;
-}
-
-sub overview {
-    my $self  = shift;
-    my @wordlist = $self->words;
-    my $words = join ", ", @wordlist;
-    $words =~ s/\%\d//g;
-    $words =~ s/\_/ /g;
-    return "$words -- (" . $self->gloss . ")";
 }
 
 # write

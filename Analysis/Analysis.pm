@@ -4,7 +4,7 @@ use strict;
 use Lingua::Wordnet;
 use vars qw($VERSION);
 
-$VERSION = '0.4';
+$VERSION = '0.5';
 
 =head1 NAME
 
@@ -107,9 +107,7 @@ on this module is active as of Winter 2000.
 
 =head1 AUTHOR
 
-Copyright (C)2000, Daniel Brian.
-
-D. Brian, dbrian@brians.org.
+Dan Brian <dbrian@brians.org>
 
 =head1 SEE ALSO
 
