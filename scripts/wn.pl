@@ -4,7 +4,6 @@
     use strict;
 
     my $wn = new Lingua::Wordnet;
-    my $password = $wn->lookup_synset("oven","n",1);
     my $word;
     my $pos;
 
@@ -15,14 +14,21 @@
         print "Enter a part-of-speech: ";
         chomp($pos  = <STDIN>);
  
-        my @synsets = $wn->lookup_synset($word,$pos);
+        my @synsets;
+        if ($pos) {
+            @synsets = $wn->lookup_synset($word,$pos);
+        } else {
+            @synsets = $wn->lookup_synset_all($word);
+        }
+
         unless (@synsets) { print "No matches found.\n\n"; next; }
 
         foreach my $synset (@synsets) {
             print "words: ", $synset->words, "\n";
+            print "pos: ", $synset->pos, "\n";
             print "gloss: ", $synset->gloss, "\n";
             print "frames: ", $synset->frames, "\n\n";
 
         }
-        
     }
+

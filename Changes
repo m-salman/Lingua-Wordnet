@@ -39,7 +39,6 @@ Revision history for Perl extension Lingua::Wordnet.
       and get an overview for the synset; it uses 'overview()'
     - added test of overloaded behavior
 
-
 0.6    Tue Oct 17 2000
     - Changed the overload syntax in Wordnet.pm (line 559) to work 
       for Perl < 5.6.
@@ -51,7 +50,25 @@ Revision history for Perl extension Lingua::Wordnet.
     - Added reverse_morph() lookups (don't use them)
     - Fixed errors in new_synset()
 
-Next (0.7):
+0.7    Wed Mar 7 2001
+
+    * Data file formats have changed in 0.7. This requires new conversion using
+      the 'scripts/convertdb.pl' script. What hasn't changed is the way any of 
+      the indexes are written, so this should not affect most code. What has 
+      changed is the way each word entry is written to the data files. Word 
+      entries are now of the form "lemma%sense_num", where sense_num is the 
+      unique number for the sense of lemma in a POS (rather than unique within 
+      a lexicographer file). This makes the return values for words conform 
+      to what you might expect to see when searching for a given sense.
+  
+    - Added lookup_synset_all()
+    - Added scripts/big_struct.pl
+    - Added scripts/tree.pl
+    - Fixed the lemma% concatenation, which misrepresented the sense numbers
+    - Changed 'scripts/convertdb.pl' to try harder to update paths in 
+      Wordnet.pm
+
+TODO:
     - methods for XML delivery of data
     - better reverse_morph() implementation
     - enhanced creation of new fields

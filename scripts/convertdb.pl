@@ -6,6 +6,8 @@ use Fcntl;
 $DELIM = '||';
 $SUBDELIM = '|';
 
+%sense_index = ();
+
 #$DB_BTREE->{'flags'} = R_DUP;
 
 print "This program will convert your Wordnet databases into files usable by\nLingua::Wordnet. This will not affect your existing Wordnet files, but\nwill require up to 40MB disk space. Continue? [y]";
@@ -154,7 +156,7 @@ open FILE, "$datadir/data.adj" or die "Couldn't open $datadir/data.adj: $!";
 while (<FILE>) {
     chop $_;
     if (/^\s+/) { next; }
-    my ($key,$data) = formatsynset($_);
+    my ($key,$data) = formatsynset($_,"a");
     $hash{$key} = $data;
 }
 close FILE;
@@ -165,7 +167,7 @@ open FILE, "$datadir/data.adv" or die "Couldn't open $datadir/data.adv: $!";
 while (<FILE>) {
      chop $_;
     if (/^\s+/) { next; }
-    my ($key,$data) = formatsynset($_);
+    my ($key,$data) = formatsynset($_,"r");
     $hash{$key} = $data;
 }
 close FILE;
@@ -176,7 +178,7 @@ open FILE, "$datadir/data.noun" or die "Couldn't open $datadir/data.noun: $!";
 while (<FILE>) {
     chop $_;
     if (/^\s+/) { next; }
-    my ($key,$data) = formatsynset($_);
+    my ($key,$data) = formatsynset($_,"n");
     $hash{$key} = $data;
 }
 close FILE;
@@ -187,7 +189,7 @@ open FILE, "$datadir/data.verb" or die "Couldn't open $datadir/data.verb: $!";
 while (<FILE>) {
     chop $_;
     if (/^\s+/) { next; }
-    my ($key,$data) = formatsynset($_);
+    my ($key,$data) = formatsynset($_,"v");
     $hash{$key} = $data;
 }
 close FILE;
@@ -198,8 +200,8 @@ print "  Gloss index:   \"index.gloss\" => \"lingua_wordnet.gloss\"\n";
 
 print "\nConversion completed.\n"; sleep(1);
 
-if ($newdir ne "/usr/local/wordnet1.6/lingua-wordnet/"){
-    chdir("../");
+#if ($newdir ne "/usr/local/wordnet1.6/lingua-wordnet/"){
+    chdir("../") if (`pwd` =~ /scripts\/*$/);
     link("Wordnet.pm","Wordnet.pm.old");
     unlink("Wordnet.pm");
     open FILE, "Wordnet.pm.old";
@@ -213,7 +215,7 @@ if ($newdir ne "/usr/local/wordnet1.6/lingua-wordnet/"){
     }
     close NEWFILE;
     close FILE;
-}
+#}
 
 sub formatindex {
     #s_gravenhage n 1 2 @ #p 1 0 06537474
@@ -245,6 +247,10 @@ sub formatindex {
         for $i (1 .. $sense_cnt) {
             if ($string =~ /\G(\d{8})\s*/g) {
                 push(@synsets,$1);
+                $sense_index{$1 . "%" . $pos . "%" . $lemma} = $i;
+                #if ($lemma eq "plant") {
+                #    print "sense_index: $1%$pos: $i\n";
+                #}
             } else {
                 print "synsets error\n";
                 $okparse = 0;
@@ -267,6 +273,7 @@ sub formatindex {
 
 sub formatsynset {
     my $string = shift;
+    my $pos = shift;
     my $okparse = 1;
     my ($offset,$filenum,$ss_type,$w_cnt,$words,$ptrs,$frames) = "";
     if ($string =~ /^(\d+)\s(\d{2})\s(\w)\s(\w{2})\s/g) {
@@ -279,7 +286,11 @@ sub formatsynset {
             if ($string =~ /\G(\S+)\s(\w)*\s*/g) {
                 my $word = $1;
                 my $lex_id = $2;
-                $words .= "$SUBDELIM$word\%$lex_id";
+                #if ($word eq "plant") {
+                #    print "synset: $offset%$pos:  " . $sense_index{$offset . "%" .  $pos . "%" . $word} . "\n";
+                #}
+                $words .= "$SUBDELIM$word\%" . $sense_index{$offset . "%" .
+                        $pos . "%" . $word};
             } else {
                 $okparse = 0;
             }

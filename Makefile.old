@@ -18,23 +18,23 @@
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /usr/local/lib/perl5/5.6.0/i686-linux/Config.pm)
+# These definitions are from config.sh (via /usr/local/lib/perl5/5.6.0/i386-freebsd/Config.pm)
 
 # They may have been overridden via Makefile.PL or on the command line
 AR = ar
 CC = cc
-CCCDLFLAGS = -fpic
-CCDLFLAGS = -rdynamic
+CCCDLFLAGS = -DPIC -fpic
+CCDLFLAGS =  
 DLEXT = so
 DLSRC = dl_dlopen.xs
 LD = cc
-LDDLFLAGS = -shared -L/usr/local/lib
-LDFLAGS =  -L/usr/local/lib
-LIBC = /lib/libc-2.1.2.so
+LDDLFLAGS = -shared  -L/usr/local/lib
+LDFLAGS = -Wl,-E  -L/usr/local/lib
+LIBC = 
 LIB_EXT = .a
 OBJ_EXT = .o
-OSNAME = linux
-OSVERS = 2.2.14
+OSNAME = freebsd
+OSVERS = 4.2-release
 RANLIB = :
 SO = so
 EXE_EXT = 
@@ -46,9 +46,9 @@ AR_STATIC_ARGS = cr
 NAME = Lingua::Wordnet
 DISTNAME = Lingua-Wordnet
 NAME_SYM = Lingua_Wordnet
-VERSION = 0.65
-VERSION_SYM = 0_65
-XS_VERSION = 0.65
+VERSION = 0.7
+VERSION_SYM = 0_7
+XS_VERSION = 0.7
 INST_BIN = blib/bin
 INST_EXE = blib/script
 INST_LIB = blib/lib
@@ -57,20 +57,20 @@ INST_SCRIPT = blib/script
 PREFIX = /usr/local
 INSTALLDIRS = site
 INSTALLPRIVLIB = $(PREFIX)/lib/perl5/5.6.0
-INSTALLARCHLIB = $(PREFIX)/lib/perl5/5.6.0/i686-linux
+INSTALLARCHLIB = $(PREFIX)/lib/perl5/5.6.0/i386-freebsd
 INSTALLSITELIB = $(PREFIX)/lib/perl5/site_perl/5.6.0
-INSTALLSITEARCH = $(PREFIX)/lib/perl5/site_perl/5.6.0/i686-linux
+INSTALLSITEARCH = $(PREFIX)/lib/perl5/site_perl/5.6.0/i386-freebsd
 INSTALLBIN = $(PREFIX)/bin
 INSTALLSCRIPT = $(PREFIX)/bin
 PERL_LIB = /usr/local/lib/perl5/5.6.0
-PERL_ARCHLIB = /usr/local/lib/perl5/5.6.0/i686-linux
+PERL_ARCHLIB = /usr/local/lib/perl5/5.6.0/i386-freebsd
 SITELIBEXP = /usr/local/lib/perl5/site_perl/5.6.0
-SITEARCHEXP = /usr/local/lib/perl5/site_perl/5.6.0/i686-linux
+SITEARCHEXP = /usr/local/lib/perl5/site_perl/5.6.0/i386-freebsd
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKE_APERL_FILE = Makefile.aperl
 PERLMAINCC = $(CC)
-PERL_INC = /usr/local/lib/perl5/5.6.0/i686-linux/CORE
+PERL_INC = /usr/local/lib/perl5/5.6.0/i386-freebsd/CORE
 PERL = /usr/bin/perl
 FULLPERL = /usr/bin/perl
 FULL_AR = /usr/bin/ar
@@ -290,21 +290,21 @@ config :: $(INST_ARCHAUTODIR)/.exists
 config :: $(INST_AUTODIR)/.exists
 	@$(NOOP)
 
-$(INST_AUTODIR)/.exists :: /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h
+$(INST_AUTODIR)/.exists :: /usr/local/lib/perl5/5.6.0/i386-freebsd/CORE/perl.h
 	@$(MKPATH) $(INST_AUTODIR)
-	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h $(INST_AUTODIR)/.exists
+	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i386-freebsd/CORE/perl.h $(INST_AUTODIR)/.exists
 
 	-@$(CHMOD) $(PERM_RWX) $(INST_AUTODIR)
 
-$(INST_LIBDIR)/.exists :: /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h
+$(INST_LIBDIR)/.exists :: /usr/local/lib/perl5/5.6.0/i386-freebsd/CORE/perl.h
 	@$(MKPATH) $(INST_LIBDIR)
-	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h $(INST_LIBDIR)/.exists
+	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i386-freebsd/CORE/perl.h $(INST_LIBDIR)/.exists
 
 	-@$(CHMOD) $(PERM_RWX) $(INST_LIBDIR)
 
-$(INST_ARCHAUTODIR)/.exists :: /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h
+$(INST_ARCHAUTODIR)/.exists :: /usr/local/lib/perl5/5.6.0/i386-freebsd/CORE/perl.h
 	@$(MKPATH) $(INST_ARCHAUTODIR)
-	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h $(INST_ARCHAUTODIR)/.exists
+	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i386-freebsd/CORE/perl.h $(INST_ARCHAUTODIR)/.exists
 
 	-@$(CHMOD) $(PERM_RWX) $(INST_ARCHAUTODIR)
 
@@ -312,9 +312,9 @@ config :: $(INST_MAN3DIR)/.exists
 	@$(NOOP)
 
 
-$(INST_MAN3DIR)/.exists :: /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h
+$(INST_MAN3DIR)/.exists :: /usr/local/lib/perl5/5.6.0/i386-freebsd/CORE/perl.h
 	@$(MKPATH) $(INST_MAN3DIR)
-	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i686-linux/CORE/perl.h $(INST_MAN3DIR)/.exists
+	@$(EQUALIZE_TIMESTAMP) /usr/local/lib/perl5/5.6.0/i386-freebsd/CORE/perl.h $(INST_MAN3DIR)/.exists
 
 	-@$(CHMOD) $(PERM_RWX) $(INST_MAN3DIR)
 
@@ -659,7 +659,7 @@ testdb_static :: testdb_dynamic
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd:
-	@$(PERL) -e "print qq{<SOFTPKG NAME=\"Lingua-Wordnet\" VERSION=\"0,65,0,0\">\n}. qq{\t<TITLE>Lingua-Wordnet</TITLE>\n}. qq{\t<ABSTRACT></ABSTRACT>\n}. qq{\t<AUTHOR></AUTHOR>\n}. qq{\t<IMPLEMENTATION>\n}. qq{\t\t<OS NAME=\"$(OSNAME)\" />\n}. qq{\t\t<ARCHITECTURE NAME=\"i686-linux\" />\n}. qq{\t\t<CODEBASE HREF=\"\" />\n}. qq{\t</IMPLEMENTATION>\n}. qq{</SOFTPKG>\n}" > Lingua-Wordnet.ppd
+	@$(PERL) -e "print qq{<SOFTPKG NAME=\"Lingua-Wordnet\" VERSION=\"0,7,0,0\">\n}. qq{\t<TITLE>Lingua-Wordnet</TITLE>\n}. qq{\t<ABSTRACT></ABSTRACT>\n}. qq{\t<AUTHOR></AUTHOR>\n}. qq{\t<IMPLEMENTATION>\n}. qq{\t\t<OS NAME=\"$(OSNAME)\" />\n}. qq{\t\t<ARCHITECTURE NAME=\"i386-freebsd\" />\n}. qq{\t\t<CODEBASE HREF=\"\" />\n}. qq{\t</IMPLEMENTATION>\n}. qq{</SOFTPKG>\n}" > Lingua-Wordnet.ppd
 
 # --- MakeMaker pm_to_blib section:
 
