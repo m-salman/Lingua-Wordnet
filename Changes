@@ -89,9 +89,15 @@ Revision history for Perl extension Lingua::Wordnet.
 
     - Fixed test.pl ... again ... to work with new synset numbers
 
+0.73    Tue Dec 18 2001
+
+    - Changes synset write() behaviour to store offsets correctly, and 
+      changed Lingua::Wordnet typos. Thanks Marco Nova.
 
 TODO:
     - methods for XML delivery of data
     - better reverse_morph() implementation
     - enhanced creation of new fields
+    (these changes are part of the Linguana project - http://linguana.net)
+
 

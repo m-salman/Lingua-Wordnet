@@ -10,7 +10,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = ( );
 @EXPORT = qw( );
-$VERSION = '0.72';
+$VERSION = '0.73';
 $DICTDIR = '/usr/local/lingua-wordnet/';
 $DELIM = '||';
 $SUBDELIM = '|';
@@ -193,19 +193,19 @@ Returns an array of synset objects for all holonyms of $synset.
 
 The following seven functions mirror the above functionality for holonyms, and accordingly have corresponding add_ and delete_ functions which update any set values to the corresponding meronym pointers:
 
-=item $synset->comp_holonym()
+=item $synset->comp_holonyms()
 
-=item $synset->member_holonym()
+=item $synset->member_holonyms()
 
-=item $synset->stuff_holonym()
+=item $synset->stuff_holonyms()
 
-=item $synset->portion_holonym()
+=item $synset->portion_holonyms()
 
-=item $synset->feature_holonym()
+=item $synset->feature_holonyms()
 
-=item $synset->place_holonym()
+=item $synset->place_holonyms()
 
-=item $synset->phase_holonym()
+=item $synset->phase_holonyms()
 
 
 =item $synset->gloss([TEXT])
@@ -619,6 +619,7 @@ sub write {
             $self->{offset} = ${$self->{wn}}->{datahash}->{offsetcount} . "\%$1";
         }  else {
             $strippedoffset = $self->{offset};
+            $strippedoffset =~ s/\%(\w)$//;
         }
         # write the data entry
         ${$self->{wn}}->{datahash}->{$self->{offset}} = 
@@ -632,7 +633,7 @@ sub write {
             if (exists(${$self->{wn}}->{indexhash}->{$iword})) {
                 # check if synset is already here
                 unless (${$self->{wn}}->{indexhash}->{$iword} =~ 
-                         /$self->{offset}/) {
+                         /$strippedoffset/) {
                     ${$self->{wn}}->{indexhash}->{$iword} .= "$Lingua::Wordnet::SUBDELIM" .  
                         $strippedoffset;
                 } 
